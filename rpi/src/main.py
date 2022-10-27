@@ -37,8 +37,8 @@ def transmit(txSocket):
         send(message_data, txSocket, TX_ADDR, TX_PORT)
         
 def main():
-    useSockets = False
     useUserInterface = True
+    useSockets = False
     useNeoPixels = True
     useMotionSensor = False
     useWindowSensor = False
@@ -80,6 +80,11 @@ def main():
         tx_thread = threading.Thread(target=transmit, args=(txSock,))
         tx_thread.start()
 
+    ########################################
+    #Do magical processing
+    ########################################
+    
+
     #Quit first based on console input
     if(useUserInterface):
         userInterfaceThread.join()
@@ -89,15 +94,11 @@ def main():
         rx_thread.join()
         tx_thread.join()
         
-
     #NeoPixel cleanup   
     if(useNeoPixels):
         neopixInterface.shutdown()
-        pixelThread.join()
+        pixelThread.join()    
         
-        
-        
-    
     print("Exiting")
   
 if __name__=="__main__":

@@ -2,8 +2,11 @@
 ## INSTALLATION
 ########################################
 -Install Neopixel dependencies
-sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 
+-Install Bluetooth dependencies
+apt-get install bluetooth bluez libbluetooth-dev
+python3 -m pip install pybluez
 ########################################
 ## Integration
 ########################################
