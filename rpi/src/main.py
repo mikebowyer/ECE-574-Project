@@ -4,6 +4,7 @@ from socket_interface import *
 import neopixel_interface
 import motion_sensor_interface
 import window_sensor_interface
+import alarm_audio_interface
 
 TX_ADDR = "192.168.1.12"
 TX_PORT = 5555
@@ -39,9 +40,10 @@ def transmit(txSocket):
 def main():
     useUserInterface = True
     useSockets = False
-    useNeoPixels = True
+    useNeoPixels = False
     useMotionSensor = False
     useWindowSensor = False
+    useAlarmAudio = True
     
     #NeoPixel Interface
     neopixInterface = None
@@ -79,6 +81,11 @@ def main():
         #UDP Transmit Thread
         tx_thread = threading.Thread(target=transmit, args=(txSock,))
         tx_thread.start()
+        
+    if(useAlarmAudio):
+        alarmAudioInterface = alarm_audio_interface.AlarmAudioInterface()
+        alarmAudioInterface.playAlertSound()
+        alarmAudioInterface.playAlarmSound()
 
     ########################################
     #Do magical processing
