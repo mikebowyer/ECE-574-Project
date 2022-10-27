@@ -1,0 +1,17 @@
+########################################
+## INSTALLATION
+########################################
+-Install Neopixel dependencies
+sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+
+########################################
+## Integration
+########################################
+-NeoPixel connections:
+    -5V to either 5V on Pi
+    -Ground to any ground
+    -Data in to GPIO 18
+########################################
+## RUNNING
+########################################
+-When using Neopixels, the script must be run as sudo
