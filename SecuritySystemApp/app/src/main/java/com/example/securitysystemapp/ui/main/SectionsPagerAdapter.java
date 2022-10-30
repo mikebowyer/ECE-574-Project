@@ -31,7 +31,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // Return a PlaceholderFragment (defined as a static inner class below).
         if (position == 0) {
             return ControlFragment.newInstance(0);
-
         }
         else{
             return SettingsFragment.newInstance(1);
