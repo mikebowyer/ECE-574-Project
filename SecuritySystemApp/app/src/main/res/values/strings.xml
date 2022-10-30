@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SecuritySystemApp</string>
+    <string name="tab_text_1">System Control</string>
+    <string name="tab_text_2">Settings</string>
+    <string name="lights_state_text">Lights State:</string>
+    <string name="alarm_state_text">Alarm State:</string>
+</resources>
