@@ -2,6 +2,7 @@ package com.example.securitysystemapp.ui.main;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
 public class SettingsFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private Context globalContext = null;
 
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
@@ -80,6 +82,7 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        globalContext = this.getActivity();
         super.onCreate(savedInstanceState);
 
 //        pageViewModel = new ViewModelProvider(this).get(PageViewModel.class);
@@ -93,9 +96,9 @@ public class SettingsFragment extends Fragment {
     protected Dialog createdDialog(int id) {
         switch (id) {
             case LIGHTS_ON_TIME_DIALOG_ID:
-                return new TimePickerDialog(getActivity().getApplicationContext(), onTimePickerListener, onTimeHour, onTimeMin, false);
+                return new TimePickerDialog(globalContext, onTimePickerListener, onTimeHour, onTimeMin, false);
             case LIGHTS_OFF_TIME_DIALOG_ID:
-                return new TimePickerDialog(getActivity().getApplicationContext(), offTimePickerListener, offTimeHour, offTimeMin, false);
+                return new TimePickerDialog(globalContext, offTimePickerListener, offTimeHour, offTimeMin, false);
         }
         return null;
     }

@@ -5,5 +5,5 @@
     <string name="lights_state_text">Lights State:</string>
     <string name="alarm_state_text">Alarm State:</string>
     <string name="light_on_text">Lights On Scheduled Time:</string>
-    <string name="light_off_text">Lights Off Scheduled Time</string>
+    <string name="light_off_text">Lights Off Scheduled Time:</string>
 </resources>
