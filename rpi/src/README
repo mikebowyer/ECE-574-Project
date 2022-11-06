@@ -10,6 +10,9 @@ python3 -m pip install pybluez
 
 -Install Audio playback in python (playsound didn't work)
 python3 -m pip install pydub
+
+-Install Raspberry Pi GPIO interface
+sudo apt-get install rpi.gpio
 ########################################
 ## Integration
 ########################################
