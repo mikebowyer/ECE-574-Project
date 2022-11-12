@@ -43,8 +43,8 @@ def main():
     useUserInterface = True
     useSockets = False
     useNeoPixels = False
-    useMotionSensor = False
-    useWindowSensor = True
+    useMotionSensor = True
+    useWindowSensor = False
     useAlarmAudio = False
     
     #NeoPixel Interface
@@ -65,6 +65,9 @@ def main():
     if(useMotionSensor):
         motionSensorInterface = motion_sensor_interface.MotionSensorInterface()
         motionSensorInterface.init()
+        motionSensorInterface.test()
+        motionSensorThread = threading.Thread(target=motionSensorInterface.runSensor, args=())
+        motionSensorThread.start()
     
     if(useWindowSensor):
         windowSensorInterface = window_sensor_interface.WindowSensorInterface()

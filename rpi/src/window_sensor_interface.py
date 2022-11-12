@@ -18,7 +18,7 @@ class WindowSensorInterface:
         
         while not self.terminate:
             sensorInput = GPIO.input(self.inputPin)
-            #print('Window Sensor: ' + str(sensorInput))
+            print('Window Sensor: ' + str(sensorInput))
             time.sleep(.2)
             
     def shutdown(self):
