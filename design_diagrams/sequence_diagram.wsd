@@ -15,12 +15,7 @@ autonumber 10
 Android -> Rpi : Initiate connection
 Rpi -> Android : Connection established, System Ready
 group System Settings Download [SettingsDownload]
-    Android -> Rpi : Query current system settings
-    Rpi -> Android : Current Lights and Color State
-    Rpi -> Android : Current Alarm State
-    Rpi -> Android : Current Lights On/Off State
-    Rpi -> Android : Current Lights Color State
-    Rpi -> Android : Current alarm audio recording name
+    Rpi -> Android : Current System Settings Packet
 end
 Android -> User : Display current system settings to user
 
@@ -30,91 +25,90 @@ Android -> User : Display current lights state and color to user
 User -> Android : Change lights state or color
 
 group Lights State Change [LightStateChange]
-    Android -> Rpi : Send lights control packet
+    Android -> Rpi : Current System Settings Packet (with light setting changed)
     Rpi -> Rpi : Save lights control state
     Rpi -> Rpi : Change lights state
-    Rpi -> Android : Current lights state
 end
 
 Android -> User : Display current lights state to user
 
-== Change Alarm State ==
-autonumber 30
-Android -> User : Display current alarm state to user
-User -> Android : Change alarm state
+' == Change Alarm State ==
+' autonumber 30
+' Android -> User : Display current alarm state to user
+' User -> Android : Change alarm state
 
-group Alarm State Change [AlarmStateChange]
-    Android -> Rpi : Send alarm control packet
-    Rpi -> Rpi : Save alarm control state
-    Rpi -> Rpi : Change alarm state
-    Rpi -> Android : Current alarm State
-end
+' group Alarm State Change [AlarmStateChange]
+'     Android -> Rpi : Send alarm control packet
+'     Rpi -> Rpi : Save alarm control state
+'     Rpi -> Rpi : Change alarm state
+'     Rpi -> Android : Current alarm State
+' end
 
-Android -> User : Display current alarm state to user
+' Android -> User : Display current alarm state to user
 
-== Change Lights On/Off Timer Setting ==
-autonumber 40
-Android -> User : Display current lights on/off timer to user
-User -> Android : Change lights on/off timer
+' == Change Lights On/Off Timer Setting ==
+' autonumber 40
+' Android -> User : Display current lights on/off timer to user
+' User -> Android : Change lights on/off timer
 
-group Lights Timer State Change [TimerStateChange]
-    Android -> Rpi : Send lights on/off timer change packet
-    Rpi -> Rpi : Save lights on/off timer settimg
-    Rpi -> Android : Current lights on/off timer settimg
-end
+' group Lights Timer State Change [TimerStateChange]
+'     Android -> Rpi : Send lights on/off timer change packet
+'     Rpi -> Rpi : Save lights on/off timer settimg
+'     Rpi -> Android : Current lights on/off timer settimg
+' end
 
-Android -> User : Display current lights on/off timer to user
+' Android -> User : Display current lights on/off timer to user
 
-== Change Lights On/Off Timer Setting ==
-autonumber 40
-Android -> User : Display current lights on/off timer to user
-User -> Android : Change lights on/off timer
+' == Change Lights On/Off Timer Setting ==
+' autonumber 40
+' Android -> User : Display current lights on/off timer to user
+' User -> Android : Change lights on/off timer
 
-group Lights Timer State Change [TimerStateChange]
-    Android -> Rpi : Send lights on/off timer change packet
-    Rpi -> Rpi : Save lights on/off timer settimg
-    Rpi -> Rpi : Change lights on/off timer settimg
-    Rpi -> Android : Current lights on/off timer settimg
-end
+' group Lights Timer State Change [TimerStateChange]
+'     Android -> Rpi : Send lights on/off timer change packet
+'     Rpi -> Rpi : Save lights on/off timer settimg
+'     Rpi -> Rpi : Change lights on/off timer settimg
+'     Rpi -> Android : Current lights on/off timer settimg
+' end
 
-Android -> User : Display current lights on/off timer to user
+' Android -> User : Display current lights on/off timer to user
 
-== Window or Door Opened Event ==
-DoorWindowSensors -> Rpi : Door or window opened
-Rpi -> Rpi : Check state of alarm
-Rpi -> Rpi : Trigger alarm noise with customized audio
-group Window or Door Event Transmission [WindowDoorOpenDetection]
-    Rpi -> Android : Send window or door open detection event
-    ...
-    Rpi -> Android : Send window or door open detection event
-    Android -> Rpi : Detection event recieved
-end
-Android -> User : Send window or door detection event notification
+' == Window or Door Opened Event ==
+' DoorWindowSensors -> Rpi : Door or window opened
+' Rpi -> Rpi : Check state of alarm
+' Rpi -> Rpi : Trigger alarm noise with customized audio
+' group Window or Door Event Transmission [WindowDoorOpenDetection]
+'     Rpi -> Android : Send window or door open detection event
+'     ...
+'     Rpi -> Android : Send window or door open detection event
+'     Android -> Rpi : Detection event recieved
+' end
+' Android -> User : Send window or door detection event notification
 
-== Motion Detected Event ==
-MotionSensor -> Rpi : Motion Detected
-Rpi -> Rpi : Turn on lights
-Rpi -> Rpi : Check state of alarm
-Rpi -> Rpi : Trigger alarm noise with customized audio
-group Motion Detection Event Transmission [MotionDetection]
-    Rpi -> Android : Send motion detection event
-    ...
-    Rpi -> Android : Send motion detection event
-    Android -> Rpi : Motion detection event recieved
-end
-Android -> User : Send motion detection event notification
+' == Motion Detected Event ==
+' MotionSensor -> Rpi : Motion Detected
+' Rpi -> Rpi : Turn on lights
+' Rpi -> Rpi : Check state of alarm
+' Rpi -> Rpi : Trigger alarm noise with customized audio
+' group Motion Detection Event Transmission [MotionDetection]
+'     Rpi -> Android : Send motion detection event
+'     ...
+'     Rpi -> Android : Send motion detection event
+'     Android -> Rpi : Motion detection event recieved
+' end
+' Android -> User : Send motion detection event notification
 
-== Customize Alarm Audio ==
-User -> Android : Change customized alarm noise
-Android -> Android : Record audio
-User -> Android : Stop audio recording
+' == Customize Alarm Audio ==
+' User -> Android : Change customized alarm noise
+' Android -> Android : Record audio
+' User -> Android : Stop audio recording
 
-group Customized Alarm Audio Transmittion [AudioTransmission]
-    Android -> Rpi: Audio recording transmission 
-    Rpi -> Rpi : Store audio recording
-    Rpi -> Rpi : Change default alarm audio
-    Rpi -> Android: Audio recording setting change sucess
-end
+' group Customized Alarm Audio Transmittion [AudioTransmission]
+'     Android -> Rpi: Audio recording transmission 
+'     Rpi -> Rpi : Store audio recording
+'     Rpi -> Rpi : Change default alarm audio
+'     Rpi -> Android: Audio recording setting change sucess
+' end
 
-Android -> User: Display current alarm audio recording name
-@enduml
+' Android -> User: Display current alarm audio recording name
+' @enduml
