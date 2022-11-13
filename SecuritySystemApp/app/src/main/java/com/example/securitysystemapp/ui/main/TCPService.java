@@ -80,7 +80,7 @@ public class TCPService extends Service {
                 boolean connectAttempt = (clientSocket == null);
                 if (!connectAttempt)
                 {
-                    output.println("heartbeat");
+                    output.println("heartbeat5");
                     if (output.checkError())
                     {
                         connectAttempt = true;
