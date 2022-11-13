@@ -58,22 +58,23 @@ public class TCPService extends Service {
         @Override
         public void run() {
             Log.i("ClientThread", "Starting Attempting Connection");
-            try {
-                InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
 
-                clientSocket = new Socket(serverAddr, SERVERPORT);
-                Log.i("ClientThread", "Connection Established");
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (Exception e){
-                Log.i("ClientThread", "FUCK");
-            }
-            while (!Thread.currentThread().isInterrupted()) {
-                Log.i("ClientThread", "Starting Comms Thread");
-                CommunicationThread commThread = new CommunicationThread(clientSocket);
-                new Thread(commThread).start();
+            while(clientSocket == null || !clientSocket.isConnected()){
+                try {
+                    InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+
+                    clientSocket = new Socket(serverAddr, SERVERPORT);
+                    Log.i("ClientThread", "Connection Established");
+                    Log.i("ClientThread", "Starting Comms Thread");
+                    CommunicationThread commThread = new CommunicationThread(clientSocket);
+                    new Thread(commThread).start();
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (Exception e){
+                    Log.i("ClientThread", "FUCK");
+                }
             }
         }
     }
@@ -91,6 +92,8 @@ public class TCPService extends Service {
             try {
 
                 this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+                String read = input.readLine();
+                Log.i("ComsThread", read);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -102,6 +105,7 @@ public class TCPService extends Service {
             try {
 
                 String read = input.readLine();
+                Log.i("ComThread", "read");
 
                 //update ui
                 //best way I found is to save the text somewhere and notify the MainActivity
