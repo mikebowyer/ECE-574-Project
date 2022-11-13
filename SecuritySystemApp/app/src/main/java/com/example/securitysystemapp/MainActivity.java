@@ -1,12 +1,15 @@
 package com.example.securitysystemapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import com.example.securitysystemapp.ui.main.TCPService;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,26 +46,13 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs = binding.tabs;
         tabs.setupWithViewPager(viewPager);
 
-        new Thread(new ClientThread()).start();
-    }
+        // Start TCP Comms
 
-    class ClientThread implements Runnable {
+        Intent startServer = new Intent(this, TCPService.class);
+        startServer.setAction(TCPService.START_SERVER);
+        Log.i("MainActivity", "Starting TCP Service");
+        startService(startServer);
 
-        @Override
-        public void run() {
-
-            try {
-                InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-
-                socket = new Socket(serverAddr, SERVERPORT);
-
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-        }
 
     }
 }
