@@ -44,7 +44,9 @@ def server_program():
         print(recieved_str)
         
 
-        conn.send(b"abcd\n")
+        string_to_send = Packet().assemble_packet_to_send()
+        bytestream = bytes(string_to_send, 'utf-8')
+        conn.send(bytestream)
 
         # conn.send(data.encode())  # send data to the client
         # PACKET_SIZE = 1024
@@ -55,6 +57,40 @@ def server_program():
 
     conn.close()  # close the connection
     
+class Packet:
+    def __init__(self):
+        self.enable = 0xFF
+        self.alarm_state = 0x00
+        self.lights = 0x00
+        self.light_on_hour = 0x00
+        self.light_on_min = 0x00
+        self.light_off_hour = 0x00
+        self.light_off_min = 0x00
+        self.lights_color_red = 0x00
+        self.lights_color_green = 0x00
+        self.lights_color_red = 0x00
+        self.selected_audio_clip = 0x00
+        self.alarm_triggered = 0x00
+        self.alarm_trigger_event = 0x00
+
+    def assemble_packet_to_send(self):
+        string_to_send = ""
+        string_to_send+=f'{self.enable:02x}'
+        string_to_send+=f'{self.alarm_state:02x}'
+        string_to_send+=f'{self.lights:02x}'
+        string_to_send+=f'{self.light_on_hour:02x}'
+        string_to_send+=f'{self.light_on_min:02x}'
+        string_to_send+=f'{self.light_off_hour:02x}'
+        string_to_send+=f'{self.light_off_min:02x}'
+        string_to_send+=f'{self.lights_color_red:02x}'
+        string_to_send+=f'{self.lights_color_green:02x}'
+        string_to_send+=f'{self.lights_color_red:02x}'
+        string_to_send+=f'{self.selected_audio_clip:02x}'
+        string_to_send+=f'{self.alarm_triggered:02x}'
+        string_to_send+=f'{self.alarm_trigger_event:02x}'
+        string_to_send += "\n"
+
+        return string_to_send
 
 
 if __name__ == '__main__':

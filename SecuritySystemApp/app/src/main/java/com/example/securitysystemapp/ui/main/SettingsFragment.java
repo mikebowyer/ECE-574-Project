@@ -139,8 +139,8 @@ public class SettingsFragment extends Fragment {
             onTimeMin = minutes;
             onTimeView.setText(getTimeString(onTimeHour, onTimeMin));
 
-
-            Log.i("OUTPUT",mService.getMyString());
+            String result =  mService.getMyString();
+            Log.i("OUTPUT",result);
             mService.sendDataToSystem("Hi Dad!");
 //            SharedPreferences.Editor editor = sharedpreferences.edit();
 //            editor.putInt(StartTimeHour, hr);

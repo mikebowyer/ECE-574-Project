@@ -19,28 +19,24 @@ import java.net.UnknownHostException;
 
 
 public class TCPService extends Service {
-    public static final String START_SERVER = "startserver";
-    public static final String STOP_SERVER = "stopserver";
-    public static final int SERVERPORT = 5000;
+    public TCPService() {
 
-    String myString;
-    public String getMyString() {
-        return myString;
     }
-
-    // Server Info
+/*
+        Member Variables
+ */
+    // Server Information
+    public static final String START_SERVER = "startserver";
+    public static final int SERVERPORT = 5000;
     private static final String SERVER_IP = "192.168.0.109";
+    Thread connectionThread;
+    public Socket clientSocket;
 
     // Binder given to clients
     private final IBinder binder = new LocalBinder();
 
-    Thread connectionThread;
-    public Socket clientSocket;
-
-
-    public TCPService() {
-
-    }
+    // Interpretted  Information
+    String myString = "dumb";
 
     //called when the services starts
     @Override
@@ -48,9 +44,13 @@ public class TCPService extends Service {
         Log.i("onStartCommand", "Starting Client Thread");
         this.connectionThread = new Thread(new ConnectionThread());
         this.connectionThread.start();
-
         return START_REDELIVER_INTENT;
     }
+
+/*
+        Binding Information
+ */
+
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -68,19 +68,17 @@ public class TCPService extends Service {
         return binder;
     }
 
-    /** method for clients */
-    public void sendDataToSystem(String dataToSend) {
-        SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
-        new Thread(senderThread).start();
-    }
 
+/*
+        Threads
+ */
     class ConnectionThread implements Runnable {
 
         private PrintWriter output;
         Thread recThread;
         @Override
         public void run() {
-            Log.i("ConnectionThread", "Starting Attempting Connection");
+            Log.i("ConnectionThread", "Starting Connection Thread");
             while(true) {
 
                 boolean connectAttempt = (clientSocket == null);
@@ -95,17 +93,20 @@ public class TCPService extends Service {
 
                 if (connectAttempt) {
                     try {
+                        Log.i("ConnectionThread", "Attempting Connection to server");
                         InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-
                         clientSocket = new Socket(serverAddr, SERVERPORT);
+
                         Log.i("ConnectionThread", "Connection Established");
-                        Log.i("ConnectionThread", "Starting Comms Thread");
                         this.output = new PrintWriter(clientSocket.getOutputStream(), true);
 
                         // Start thread
+
                         if (recThread != null) {
+                            Log.i("ConnectionThread", "Stopping Receiver Thread");
                             recThread.stop();
                         }
+                        Log.i("ConnectionThread", "Starting Receiver Thread");
                         RecieverRunnable recieverRunnable = new RecieverRunnable(clientSocket);
                         Thread recThread = new Thread(recieverRunnable);
                         recThread.start();
@@ -114,12 +115,13 @@ public class TCPService extends Service {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     } catch (Exception e) {
-                        Log.i("ConnectionThread", "FUCK");
+                        Log.i("ConnectionThread", "Something else went wrong");
                     }
                 }
 
                 // On retry connection every few seconds
                 try {
+                    Log.i("ConnectionThread", "Sleeping...");
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -135,13 +137,9 @@ public class TCPService extends Service {
         private BufferedReader input;
 
         public RecieverRunnable(Socket clientSocket) {
-
             this.clientSocket = clientSocket;
-
             try {
-
                 this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -151,25 +149,21 @@ public class TCPService extends Service {
             while(true) {
                 try {
                     String result = input.readLine();
-                    Log.i("ReADIN",result);
+                    Log.i("RecieverRunnable",result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-
         }
     }
 
     class SenderThread implements Runnable {
-
         private Socket clientSocket;
-
         private PrintWriter output;
 
         String data;
 
         public SenderThread(Socket clientSocket, String send_data) {
-
             this.clientSocket = clientSocket;
             this.data = send_data;
             try {
@@ -180,7 +174,22 @@ public class TCPService extends Service {
         }
 
         public void run() {
+            Log.i("SenderRunnable",this.data);
             output.println(this.data);
         }
     }
+
+/*
+        Public Interface
+ */
+    public String getMyString() {
+        return myString;
+    }
+
+    /** method for clients */
+    public void sendDataToSystem(String dataToSend) {
+        SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
+        new Thread(senderThread).start();
+    }
+
 }
