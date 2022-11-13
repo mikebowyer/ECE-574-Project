@@ -38,16 +38,24 @@ def transmit(txSocket):
         send(message_data, txSocket, TX_ADDR, TX_PORT)
         
 def main():
+    
+    #Testing Configuration
     useUserInterface = True
     useSockets = False
     useNeoPixels = False
-    useMotionSensor = False
+    useMotionSensor = True
     useWindowSensor = False
-    useAlarmAudio = True
+    useAlarmAudio = False
     
     #NeoPixel Interface
     neopixInterface = None
     pixelThread = None
+    
+    #Window/Door Sensor Interface
+    windowSensorInterface = None
+    windowSensorThread = None
+    
+    
     if(useNeoPixels):
         neopixInterface = neopixel_interface.NeopixelInterface()
         neopixInterface.init()
@@ -57,17 +65,21 @@ def main():
     if(useMotionSensor):
         motionSensorInterface = motion_sensor_interface.MotionSensorInterface()
         motionSensorInterface.init()
+        motionSensorInterface.test()
+        motionSensorThread = threading.Thread(target=motionSensorInterface.runSensor, args=())
+        motionSensorThread.start()
     
     if(useWindowSensor):
         windowSensorInterface = window_sensor_interface.WindowSensorInterface()
         windowSensorInterface.init()
-   
-    #User Input Thread
+        windowSensorInterface.test()
+        windowSensorThread = threading.Thread(target=windowSensorInterface.runSensor, args=())
+        windowSensorThread.start()
+
     if(useUserInterface):
         userInterfaceThread = threading.Thread(target=user_interface_read, args=())
         userInterfaceThread.start()
     
-    #Sockets
     if(useSockets):
         global RX_ADDR
         global RX_PORT
@@ -104,7 +116,11 @@ def main():
     #NeoPixel cleanup   
     if(useNeoPixels):
         neopixInterface.shutdown()
-        pixelThread.join()    
+        pixelThread.join()
+        
+    if(useWindowSensor):
+        windowSensorInterface.shutdown()
+        windowSensorThread.join()
         
     print("Exiting")
   
