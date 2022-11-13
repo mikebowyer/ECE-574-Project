@@ -10,10 +10,12 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
 
 public class TCPService extends Service {
     public static final String START_SERVER = "startserver";
@@ -68,6 +70,8 @@ public class TCPService extends Service {
                     Log.i("ClientThread", "Starting Comms Thread");
                     CommunicationThread commThread = new CommunicationThread(clientSocket);
                     new Thread(commThread).start();
+                    SenderThread senderThread = new SenderThread(clientSocket, "Hi Mom!");
+                    new Thread(senderThread).start();
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
@@ -92,8 +96,6 @@ public class TCPService extends Service {
             try {
 
                 this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-                String read = input.readLine();
-                Log.i("ComsThread", read);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -114,6 +116,30 @@ public class TCPService extends Service {
                 e.printStackTrace();
             }
 
+        }
+    }
+
+    class SenderThread implements Runnable {
+
+        private Socket clientSocket;
+
+        private PrintWriter output;
+
+        String data;
+
+        public SenderThread(Socket clientSocket, String send_data) {
+
+            this.clientSocket = clientSocket;
+            this.data = send_data;
+            try {
+                output = new PrintWriter(clientSocket.getOutputStream(), true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void run() {
+            output.println(this.data);
         }
     }
 }
