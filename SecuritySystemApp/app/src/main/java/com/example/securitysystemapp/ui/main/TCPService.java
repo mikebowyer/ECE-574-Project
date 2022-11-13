@@ -25,14 +25,11 @@ public class TCPService extends Service {
 
     // Server Info
     private static final String SERVER_IP = "192.168.0.109";
-//    private static final String SERVER_IP = "DESKTOP-9MIF63P";
 
     // Binder given to clients
     private final IBinder binder = new LocalBinder();
 
-    Thread serverThread;
-    Thread clientThread;
-    ServerSocket serverSocket;
+    Thread connectionThread;
     public Socket clientSocket;
 
 
@@ -43,11 +40,9 @@ public class TCPService extends Service {
     //called when the services starts
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //action set by setAction() in activity
-
         Log.i("onStartCommand", "Starting Client Thread");
-        this.clientThread = new Thread(new ClientThread());
-        this.clientThread.start();
+        this.connectionThread = new Thread(new ConnectionThread());
+        this.connectionThread.start();
 
         return START_REDELIVER_INTENT;
     }
@@ -74,27 +69,47 @@ public class TCPService extends Service {
         new Thread(senderThread).start();
     }
 
-    class ClientThread implements Runnable {
+    class ConnectionThread implements Runnable {
 
+        private PrintWriter output;
         @Override
         public void run() {
-            Log.i("ClientThread", "Starting Attempting Connection");
+            Log.i("ConnectionThread", "Starting Attempting Connection");
+            while(true) {
 
-            while(clientSocket == null || !clientSocket.isConnected()){
+                boolean connectAttempt = (clientSocket == null);
+                if (!connectAttempt)
+                {
+                    output.println("heartbeat");
+                    if (output.checkError())
+                    {
+                        connectAttempt = true;
+                    }
+                }
+
+                if (connectAttempt) {
+                    try {
+                        InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+
+                        clientSocket = new Socket(serverAddr, SERVERPORT);
+                        Log.i("ConnectionThread", "Connection Established");
+                        Log.i("ConnectionThread", "Starting Comms Thread");
+                        this.output = new PrintWriter(clientSocket.getOutputStream(), true);
+//                        CommunicationThread commThread = new CommunicationThread(clientSocket);
+//                        new Thread(commThread).start();
+                    } catch (UnknownHostException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (Exception e) {
+                        Log.i("ConnectionThread", "FUCK");
+                    }
+                }
+                // On retry connection every few seconds
                 try {
-                    InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
-
-                    clientSocket = new Socket(serverAddr, SERVERPORT);
-                    Log.i("ClientThread", "Connection Established");
-                    Log.i("ClientThread", "Starting Comms Thread");
-                    CommunicationThread commThread = new CommunicationThread(clientSocket);
-                    new Thread(commThread).start();
-                } catch (UnknownHostException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (Exception e){
-                    Log.i("ClientThread", "FUCK");
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
