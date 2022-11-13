@@ -16,7 +16,7 @@ def server_program():
     print("Waiting for connections...\n")
     server_socket.listen(2)
     conn, address = server_socket.accept()  # accept new connection
-    # conn.settimeout(1)
+    conn.settimeout(1)
     print("Connection from: " + str(address))
     while True:
         # receive data stream. it won't accept data packet greater than 1024 bytes
@@ -28,9 +28,9 @@ def server_program():
         #     # if data is not received break
         #     break
         # print("from connected user: " + str(data))
-        # user_input = input('\nR for recieve, T for Transmit, E for exit: ')
-        user_input = "R"
-        if  "R" in user_input:
+        
+        # Recieve 
+        try:
             recieved_str = ""
             next_byte = ""
             next_byte_decoded = ""
@@ -39,14 +39,12 @@ def server_program():
                 next_byte_decoded = next_byte.decode()
                 recieved_str += next_byte_decoded
                 # print(next_byte_decoded)
-            print(recieved_str)
-            # print("Not Decoded:")
-            # print(data.hex())
-        elif "T" in user_input:
-            conn.send(b"\x00\x00\x00\n")
-        elif "E" in user_input:
-            break
+        except: 
+            pass
+        print(recieved_str)
+        
 
+        conn.send(b"abcd\n")
 
         # conn.send(data.encode())  # send data to the client
         # PACKET_SIZE = 1024

@@ -23,6 +23,11 @@ public class TCPService extends Service {
     public static final String STOP_SERVER = "stopserver";
     public static final int SERVERPORT = 5000;
 
+    String myString;
+    public String getMyString() {
+        return myString;
+    }
+
     // Server Info
     private static final String SERVER_IP = "192.168.0.109";
 
@@ -72,6 +77,7 @@ public class TCPService extends Service {
     class ConnectionThread implements Runnable {
 
         private PrintWriter output;
+        Thread recThread;
         @Override
         public void run() {
             Log.i("ConnectionThread", "Starting Attempting Connection");
@@ -80,7 +86,7 @@ public class TCPService extends Service {
                 boolean connectAttempt = (clientSocket == null);
                 if (!connectAttempt)
                 {
-                    output.println("heartbeat5");
+                    output.println("heartbeat");
                     if (output.checkError())
                     {
                         connectAttempt = true;
@@ -95,8 +101,14 @@ public class TCPService extends Service {
                         Log.i("ConnectionThread", "Connection Established");
                         Log.i("ConnectionThread", "Starting Comms Thread");
                         this.output = new PrintWriter(clientSocket.getOutputStream(), true);
-//                        CommunicationThread commThread = new CommunicationThread(clientSocket);
-//                        new Thread(commThread).start();
+
+                        // Start thread
+                        if (recThread != null) {
+                            recThread.stop();
+                        }
+                        RecieverRunnable recieverRunnable = new RecieverRunnable(clientSocket);
+                        Thread recThread = new Thread(recieverRunnable);
+                        recThread.start();
                     } catch (UnknownHostException e1) {
                         e1.printStackTrace();
                     } catch (IOException e1) {
@@ -105,6 +117,7 @@ public class TCPService extends Service {
                         Log.i("ConnectionThread", "FUCK");
                     }
                 }
+
                 // On retry connection every few seconds
                 try {
                     Thread.sleep(5000);
@@ -115,13 +128,13 @@ public class TCPService extends Service {
         }
     }
 
-    class CommunicationThread implements Runnable {
+    class RecieverRunnable implements Runnable {
 
         private Socket clientSocket;
 
         private BufferedReader input;
 
-        public CommunicationThread(Socket clientSocket) {
+        public RecieverRunnable(Socket clientSocket) {
 
             this.clientSocket = clientSocket;
 
@@ -135,17 +148,13 @@ public class TCPService extends Service {
         }
 
         public void run() {
-
-            try {
-
-                String read = input.readLine();
-                Log.i("ComThread", "read");
-
-                //update ui
-                //best way I found is to save the text somewhere and notify the MainActivity
-                //e.g. with a Broadcast
-            } catch (IOException e) {
-                e.printStackTrace();
+            while(true) {
+                try {
+                    String result = input.readLine();
+                    Log.i("ReADIN",result);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
