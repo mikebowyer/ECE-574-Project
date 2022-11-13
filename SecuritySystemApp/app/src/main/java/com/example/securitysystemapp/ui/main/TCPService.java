@@ -9,13 +9,16 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.BitSet;
 
 
 public class TCPService extends Service {
@@ -78,14 +81,14 @@ public class TCPService extends Service {
             while(true) {
 
                 boolean connectAttempt = (clientSocket == null);
-                if (!connectAttempt)
-                {
-                    output.println("heartbeat");
-                    if (output.checkError())
-                    {
-                        connectAttempt = true;
-                    }
-                }
+//                if (!connectAttempt)
+//                {
+//                    output.println("");
+//                    if (output.checkError())
+//                    {
+//                        connectAttempt = true;
+//                    }
+//                }
 
                 if (connectAttempt) {
                     try {
@@ -156,22 +159,37 @@ public class TCPService extends Service {
         private Socket clientSocket;
 
         private PrintWriter output;
+        private OutputStream outputStream;
 
-        String data;
+        BitSet data;
 
         public SenderThread(Socket clientSocket, String send_data) {
 
             this.clientSocket = clientSocket;
-            this.data = send_data;
+//            this.data = send_data;
+            this.data = new BitSet(48);
+            this.data.set(1,2);
+//            this.data = send_data;
             try {
-                output = new PrintWriter(clientSocket.getOutputStream(), true);
+//                output = new PrintWriter(clientSocket.getOutputStream(), true);
+                outputStream=clientSocket.getOutputStream();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         public void run() {
-            output.println(this.data);
+//            output.println("Q");
+
+            byte[] message = new byte[6];
+            message[0]= (byte) 0xFF;
+            message[2]= (byte) 0xFF;
+            message[4]= (byte) 0xFF;
+            try {
+                outputStream.write(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
