@@ -26,12 +26,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
-    // Socket Info
-    private Socket socket;
-    private static final int SERVERPORT = 5000;
-    private static final String SERVER_IP = "DESKTOP-9MIF63P";
-//    private static final String SERVER_IP = "192.168.0.109";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,12 +41,9 @@ public class MainActivity extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
 
         // Start TCP Comms
-
         Intent startServer = new Intent(this, TCPService.class);
         startServer.setAction(TCPService.START_SERVER);
         Log.i("MainActivity", "Starting TCP Service");
         startService(startServer);
-
-
     }
 }

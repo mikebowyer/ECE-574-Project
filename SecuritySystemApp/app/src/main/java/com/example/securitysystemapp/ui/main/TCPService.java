@@ -4,6 +4,7 @@ import static android.app.Service.START_REDELIVER_INTENT;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -26,6 +27,8 @@ public class TCPService extends Service {
     private static final String SERVER_IP = "192.168.0.109";
 //    private static final String SERVER_IP = "DESKTOP-9MIF63P";
 
+    // Binder given to clients
+    private final IBinder binder = new LocalBinder();
 
     Thread serverThread;
     Thread clientThread;
@@ -49,10 +52,26 @@ public class TCPService extends Service {
         return START_REDELIVER_INTENT;
     }
 
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        TCPService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return TCPService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return binder;
+    }
+
+    /** method for clients */
+    public void sendDataToSystem(String dataToSend) {
+        SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
+        new Thread(senderThread).start();
     }
 
     class ClientThread implements Runnable {
@@ -70,8 +89,6 @@ public class TCPService extends Service {
                     Log.i("ClientThread", "Starting Comms Thread");
                     CommunicationThread commThread = new CommunicationThread(clientSocket);
                     new Thread(commThread).start();
-                    SenderThread senderThread = new SenderThread(clientSocket, "Hi Mom!");
-                    new Thread(senderThread).start();
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
