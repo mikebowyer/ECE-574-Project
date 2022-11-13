@@ -18,15 +18,18 @@ import java.net.UnknownHostException;
 public class TCPService extends Service {
     public static final String START_SERVER = "startserver";
     public static final String STOP_SERVER = "stopserver";
-    public static final int SERVERPORT = 8080;
+    public static final int SERVERPORT = 5000;
 
     // Server Info
     private static final String SERVER_IP = "192.168.0.109";
+//    private static final String SERVER_IP = "DESKTOP-9MIF63P";
+
 
     Thread serverThread;
     Thread clientThread;
     ServerSocket serverSocket;
-    Socket clientSocket;
+    public Socket clientSocket;
+
 
     public TCPService() {
 
@@ -64,6 +67,8 @@ public class TCPService extends Service {
                 e1.printStackTrace();
             } catch (IOException e1) {
                 e1.printStackTrace();
+            } catch (Exception e){
+                Log.i("ClientThread", "FUCK");
             }
             while (!Thread.currentThread().isInterrupted()) {
                 Log.i("ClientThread", "Starting Comms Thread");
