@@ -8,6 +8,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.securitysystemapp.SecuritySystem;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,6 +21,7 @@ import java.net.UnknownHostException;
 
 
 public class TCPService extends Service {
+    SecuritySystem securitySysState;
     public TCPService() {
 
     }
@@ -41,6 +44,7 @@ public class TCPService extends Service {
     //called when the services starts
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        securitySysState = new SecuritySystem();
         Log.i("onStartCommand", "Starting Client Thread");
         this.connectionThread = new Thread(new ConnectionThread());
         this.connectionThread.start();
@@ -150,6 +154,7 @@ public class TCPService extends Service {
                 try {
                     String result = input.readLine();
                     Log.i("RecieverRunnable",result);
+                    securitySysState.setStateWithReceivedPacket(result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

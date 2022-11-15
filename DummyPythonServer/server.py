@@ -68,7 +68,7 @@ class Packet:
         self.light_off_min = 0x00
         self.lights_color_red = 0x00
         self.lights_color_green = 0x00
-        self.lights_color_red = 0x00
+        self.lights_color_blue = 0x00
         self.selected_audio_clip = 0x00
         self.alarm_triggered = 0x00
         self.alarm_trigger_event = 0x00
@@ -84,7 +84,7 @@ class Packet:
         string_to_send+=f'{self.light_off_min:02x}'
         string_to_send+=f'{self.lights_color_red:02x}'
         string_to_send+=f'{self.lights_color_green:02x}'
-        string_to_send+=f'{self.lights_color_red:02x}'
+        string_to_send+=f'{self.lights_color_blue:02x}'
         string_to_send+=f'{self.selected_audio_clip:02x}'
         string_to_send+=f'{self.alarm_triggered:02x}'
         string_to_send+=f'{self.alarm_trigger_event:02x}'
