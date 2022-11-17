@@ -3,7 +3,8 @@ package com.example.securitysystemapp;
 import android.util.Log;
 
 public class SecuritySystem {
-    public int expected_message_length = 26; // Number of characters in message string
+    public int mes_len = 26; // Number of characters in message string
+    public int alarm_armed = -1;
     public int lights = -1;
     public int light_on_hour = -1;
     public int light_on_min = -1;
@@ -23,7 +24,7 @@ public class SecuritySystem {
     public void setStateWithReceivedPacket(String message)
     {
         Log.i("SecuritySystem","Parsing input message");
-        if( message.length() != expected_message_length)
+        if( message.length() != mes_len)
         {
             Log.e("SecuritySystem","not correct length");
         }
@@ -35,14 +36,47 @@ public class SecuritySystem {
 
     public void parseMessageUpdateState(String message)
     {
-        Character enable_byte_msb = message.charAt(0);
-        Character enable_byte_lsb = message.charAt(1);
-        int enable_byte_msb_int = enable_byte_msb.digit(enable_byte_msb,16);
-        String binaryString = Integer.toBinaryString(enable_byte_msb_int);
-        byte bitMask = (byte)(0x8<<(byte)enable_byte_msb_int);
-        Log.i("Test","feck");
+        // Extract and assemble enable information
+        int enable_byte = getByteFromHexChars(message.charAt(0), message.charAt(1));
+
+        boolean enable_alarm_on_off = isBitAtPositionSet(enable_byte, 0);
+        if (enable_alarm_on_off == true)
+        {
+            int alarm_byte = getByteFromHexChars(message.charAt(mes_len-2), message.charAt(mes_len-1));
+            if (alarm_byte == 255)
+            {
+                alarm_armed = 1;
+            }
+            else
+            {
+                alarm_armed =0;
+            }
+        }
+
+        boolean enable_lights_on_off = isBitAtPositionSet(enable_byte, 1);
+        boolean enable_light_on_time = isBitAtPositionSet(enable_byte, 2);
+        boolean enable_light_off_time = isBitAtPositionSet(enable_byte, 3);
+        boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
+        boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
+        boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
 
 
+//        String binaryString = Integer.toBinaryString(enable_byte_msb_int);
 
+    }
+    public int getByteFromHexChars(Character msb, Character lsb)
+    {
+        int msb_int = msb.digit(msb,16);
+        int lsb_int = lsb.digit(lsb,16);
+        int bits_to_shift = 4;
+        int msb_int_shifted = msb_int << (bits_to_shift);
+        return msb_int_shifted | lsb_int;
+    }
+
+    public boolean isBitAtPositionSet(int byte_in, int position_of_interest)
+    {
+        int bit_mask = 1 << (position_of_interest);
+        int byte_in_masked = byte_in & bit_mask;
+        return byte_in_masked != 0;
     }
 }

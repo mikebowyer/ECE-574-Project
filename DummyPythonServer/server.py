@@ -44,7 +44,9 @@ def server_program():
         print(recieved_str)
         
 
-        string_to_send = Packet().assemble_packet_to_send()
+        mypacket= Packet()
+        mypacket.set_alarm_state(True)
+        string_to_send = mypacket.assemble_packet_to_send()
         bytestream = bytes(string_to_send, 'utf-8')
         conn.send(bytestream)
 
@@ -58,8 +60,25 @@ def server_program():
     conn.close()  # close the connection
     
 class Packet:
+    enable = 0x00
+    alarm_state = 0x00
+    lights = 0x00
+    light_on_hour = 0x00
+    light_on_min = 0x00
+    light_off_hour = 0x00
+    light_off_min = 0x00
+    lights_color_red = 0x00
+    lights_color_green = 0x00
+    lights_color_blue = 0x00
+    selected_audio_clip = 0x00
+    alarm_triggered = 0x00
+    alarm_trigger_event = 0x00
+
     def __init__(self):
-        self.enable = 0xFF
+        self.reset_everything()
+
+    def reset_everything(self):
+        self.enable = 0x00
         self.alarm_state = 0x00
         self.lights = 0x00
         self.light_on_hour = 0x00
@@ -76,21 +95,29 @@ class Packet:
     def assemble_packet_to_send(self):
         string_to_send = ""
         string_to_send+=f'{self.enable:02x}'
-        string_to_send+=f'{self.alarm_state:02x}'
-        string_to_send+=f'{self.lights:02x}'
-        string_to_send+=f'{self.light_on_hour:02x}'
-        string_to_send+=f'{self.light_on_min:02x}'
-        string_to_send+=f'{self.light_off_hour:02x}'
-        string_to_send+=f'{self.light_off_min:02x}'
-        string_to_send+=f'{self.lights_color_red:02x}'
-        string_to_send+=f'{self.lights_color_green:02x}'
-        string_to_send+=f'{self.lights_color_blue:02x}'
-        string_to_send+=f'{self.selected_audio_clip:02x}'
-        string_to_send+=f'{self.alarm_triggered:02x}'
         string_to_send+=f'{self.alarm_trigger_event:02x}'
+        string_to_send+=f'{self.alarm_triggered:02x}'
+        string_to_send+=f'{self.selected_audio_clip:02x}'
+        string_to_send+=f'{self.lights_color_blue:02x}'
+        string_to_send+=f'{self.lights_color_green:02x}'
+        string_to_send+=f'{self.lights_color_red:02x}'
+        string_to_send+=f'{self.light_off_min:02x}'
+        string_to_send+=f'{self.light_off_hour:02x}'
+        string_to_send+=f'{self.light_on_min:02x}'
+        string_to_send+=f'{self.light_on_hour:02x}'
+        string_to_send+=f'{self.lights:02x}'
+        string_to_send+=f'{self.alarm_state:02x}'
         string_to_send += "\n"
 
         return string_to_send
+
+    def set_alarm_state(self, state):
+        self.enable = self.enable | 0x01
+        if state:
+            self.alarm_state = 0xFF
+        else:
+            self.alarm_state = 0x00
+
 
 
 if __name__ == '__main__':
