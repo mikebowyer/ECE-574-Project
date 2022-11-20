@@ -5,15 +5,12 @@ autonumber
 User -> Android : Install App
 Rpi -> Rpi : Boot Up
 User -> Android : Open App
-Android -> User : Ask User for Security System Hostname 
-User -> Android : Specify Security System Host Name
-Android -> Android : Save Security System Host Name
 Android -> Android : Initiate Initialization Phase
 
 == Initialization ==
 autonumber 10
-Android -> Rpi : Initiate connection
-Rpi -> Android : Connection established, System Ready
+Android -> Rpi : Establish connection
+Rpi -> Android : Connection established
 group System Settings Download [SettingsDownload]
     Rpi -> Android : Current System Settings Packet
 end
