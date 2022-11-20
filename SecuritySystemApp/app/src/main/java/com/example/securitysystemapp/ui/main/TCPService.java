@@ -21,13 +21,10 @@ import java.net.UnknownHostException;
 
 
 public class TCPService extends Service {
-    SecuritySystem securitySysState;
-    public TCPService() {
 
-    }
-/*
-        Member Variables
- */
+//================================================================================
+// class member variables
+//================================================================================
     // Server Information
     public static final String START_SERVER = "startserver";
     public static final int SERVERPORT = 5000;
@@ -35,13 +32,16 @@ public class TCPService extends Service {
     Thread connectionThread;
     public Socket clientSocket;
 
-    // Binder given to clients
-    private final IBinder binder = new LocalBinder();
+    // System State
+    SecuritySystem securitySysState;
 
-    // Interpretted  Information
-    String myString = "dumb";
+//================================================================================
+// Service start up function
+//================================================================================
+    public TCPService() {
 
-    //called when the services starts
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         securitySysState = new SecuritySystem();
@@ -51,11 +51,12 @@ public class TCPService extends Service {
         return START_REDELIVER_INTENT;
     }
 
-/*
-        Binding Information
- */
 
-
+//================================================================================
+// Binding Information
+//================================================================================
+    // Binder given to clients
+    private final IBinder binder = new LocalBinder();
     /**
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
@@ -71,11 +72,9 @@ public class TCPService extends Service {
     public IBinder onBind(Intent intent) {
         return binder;
     }
-
-
-/*
-        Threads
- */
+//================================================================================
+// Connection Thread
+//================================================================================
     class ConnectionThread implements Runnable {
 
         private PrintWriter output;
@@ -86,14 +85,14 @@ public class TCPService extends Service {
             while(true) {
 
                 boolean connectAttempt = (clientSocket == null);
-                if (!connectAttempt)
-                {
-                    output.println("heartbeat");
-                    if (output.checkError())
-                    {
-                        connectAttempt = true;
-                    }
-                }
+//                if (!connectAttempt)
+//                {
+//                    output.println("heartbeat");
+//                    if (output.checkError())
+//                    {
+//                        connectAttempt = true;
+//                    }
+//                }
 
                 if (connectAttempt) {
                     try {
@@ -134,6 +133,9 @@ public class TCPService extends Service {
         }
     }
 
+//================================================================================
+// Receiver Thread
+//================================================================================
     class RecieverRunnable implements Runnable {
 
         private Socket clientSocket;
@@ -168,6 +170,9 @@ public class TCPService extends Service {
         }
     }
 
+//================================================================================
+// Sender Thread
+//================================================================================
     class SenderThread implements Runnable {
         private Socket clientSocket;
         private PrintWriter output;
@@ -190,15 +195,21 @@ public class TCPService extends Service {
         }
     }
 
-/*
-        Public Interface
- */
-    public String getMyString() {
-        return myString;
+//================================================================================
+// Public Methods for Users of service to call
+//================================================================================
+    public SecuritySystem getSecuritySystemState()
+    {
+        return securitySysState;
     }
 
-    /** method for clients */
     public void sendDataToSystem(String dataToSend) {
+        SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
+        new Thread(senderThread).start();
+    }
+
+    public void sendSetStateToSystem() {
+        String dataToSend = securitySysState.getDataToSend();
         SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
         new Thread(senderThread).start();
     }

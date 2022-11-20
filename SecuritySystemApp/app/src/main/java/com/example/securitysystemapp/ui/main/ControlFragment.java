@@ -31,17 +31,27 @@ import com.example.securitysystemapp.databinding.ControlFragmentBinding;
 import com.example.securitysystemapp.databinding.FragmentMainBinding;
 
 /**
- * A placeholder fragment containing a simple view.
+ * The fragment for the Control tab in the main activity.
  */
 public class ControlFragment extends Fragment {
-    TCPService mService;
-    private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private PageViewModel pageViewModel;
+//================================================================================
+// class member variables
+//================================================================================
+    // Background Service information
+    TCPService mService;
+    boolean mBound = false;
+
+    // UI Elements & Context Info
     private ControlFragmentBinding binding;
     private Context globalContext = null;
 
-    boolean mBound = false;
+//================================================================================
+// class broadcast reception
+//================================================================================
+    /**
+     * Broadcast receiver which forces all view elements to be updated.
+     */
     public class MyReceiver extends BroadcastReceiver {
 
         public MyReceiver() {
@@ -49,11 +59,45 @@ public class ControlFragment extends Fragment {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Implement code here to be performed when
-            // broadcast is detected
-            Log.i("test","test");
+            /**
+             * Gathers the current securty system information from the background service,
+             * and updates all UI elements with the latest value.
+             */
+            Log.i("ControlFragment","Received message, updating view.");
+            SecuritySystem secState = mService.getSecuritySystemState();
+            updateView(secState);
         }
     }
+
+    public void updateView(SecuritySystem secState)
+    {
+        switch(secState.alarm_armed) {
+            case 1:
+                binding.alarmToggleButton.setChecked(true);
+//                binding.alarmToggleButton.setText("Alarm Armed: On");
+                break;
+            case 0:
+                binding.alarmToggleButton.setChecked(false);
+                break;
+            default:
+                break;
+        }
+        switch(secState.lights) {
+            case 1:
+                binding.lightsToggleButton.setChecked(true);
+//                binding.alarmToggleButton.setText("Alarm Armed: On");
+                break;
+            case 0:
+                binding.lightsToggleButton.setChecked(false);
+                break;
+            default:
+                break;
+        }
+    }
+
+//================================================================================
+// Service Binding Logic
+//================================================================================
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection connection = new ServiceConnection() {
 
@@ -84,10 +128,12 @@ public class ControlFragment extends Fragment {
         }
     };
 
+//================================================================================
+// Native Fragment Implementations
+//================================================================================
     public static ControlFragment newInstance(int index) {
         ControlFragment fragment = new ControlFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -120,9 +166,29 @@ public class ControlFragment extends Fragment {
 
         // Setup Alarm toggle Button
         ToggleButton alarmToggle = binding.alarmToggleButton;
+        alarmToggle.setText("Alarm Armed: Unknown");
         alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mService.sendDataToSystem("FromControl!");
+                if (isChecked)
+                {mService.securitySysState.alarm_armed = 1;}
+                else{
+                    mService.securitySysState.alarm_armed = 0;
+                }
+                mService.sendSetStateToSystem();
+            }
+        });
+
+        // Setup Lights toggle button
+        ToggleButton lightsToggle = binding.lightsToggleButton;
+        lightsToggle.setText("Lights State: Unknown");
+        lightsToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                {mService.securitySysState.lights = 1;}
+                else{
+                    mService.securitySysState.lights = 0;
+                }
+                mService.sendSetStateToSystem();
             }
         });
 

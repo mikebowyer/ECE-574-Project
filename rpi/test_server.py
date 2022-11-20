@@ -15,48 +15,57 @@ def server_program():
     server_socket.bind((host, port))  # bind host address and port together
 
     # configure how many client the server can listen simultaneously
-    print("Waiting for connections...\n")
     server_socket.listen(2)
+
+    # Create initial state of security system
+    security_sys_state = SecurityMessage()
+    
+    # Wait for connections from clients
+    print("Waiting for connections...\n")
     conn, address = server_socket.accept()  # accept new connection
-    conn.settimeout(1)
     print("Connection from: " + str(address))
+    conn.settimeout(1) # set recv wait time
+
+    # Send starting state
+    print("Sending initial state.\n")
+    string_to_send = security_sys_state.assemble_packet_to_send()
+    bytestream = bytes(string_to_send, 'utf-8')
     while True:
-        # receive data stream. it won't accept data packet greater than 1024 bytes
-        # data = conn.recv(1024).decode()
-        # data = conn.recv(1).decode()
-        # print("Data:")
-        # print(data)
-        # if not data:
-        #     # if data is not received break
-        #     break
-        # print("from connected user: " + str(data))
-        
-        # Recieve 
-        try:
-            recieved_str = ""
-            next_byte = ""
-            next_byte_decoded = ""
-            while next_byte_decoded != "\n":
-                next_byte = conn.recv(1)
-                next_byte_decoded = next_byte.decode()
-                recieved_str += next_byte_decoded
-                # print(next_byte_decoded)
-        except: 
+
+        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, reset=reset\n')
+        if "e" in data:
+            exit
+        elif "r" in data:
+            print("Recieving latest data from app:\n")
+            try:
+                recieved_str = ""
+                next_byte = ""
+                next_byte_decoded = ""
+                while next_byte_decoded != "\n":
+                    next_byte = conn.recv(1)
+                    next_byte_decoded = next_byte.decode()
+                    recieved_str += next_byte_decoded
+                    # print(next_byte_decoded)
+                print(recieved_str)
+            except: 
+                pass
+        elif "s" in data:
+            print("Sending current system state to app:\n")         
+            string_to_send = security_sys_state.assemble_packet_to_send()
+            bytestream = bytes(string_to_send, 'utf-8')
+            conn.send(bytestream)
+        elif "c" in data:
+            print("Changing Alaram and light state!:\n")       
+            security_sys_state.set_alarm_state(True)
+            security_sys_state.set_light_state(True)
+        elif "reset" in data:
+            security_sys_state.reset_everything()
+        else:
             pass
-        print(recieved_str)
-        
+            
+                
 
-        mypacket= SecurityMessage()
-        mypacket.set_alarm_state(True)
-        string_to_send = mypacket.assemble_packet_to_send()
-        bytestream = bytes(string_to_send, 'utf-8')
-        conn.send(bytestream)
-
-        # conn.send(data.encode())  # send data to the client
-        # PACKET_SIZE = 1024
-        # line = "random len of line here"
-        # conn.send(b"00\n")
-        # data = input(' -> ')
+            
 
 
     conn.close()  # close the connection

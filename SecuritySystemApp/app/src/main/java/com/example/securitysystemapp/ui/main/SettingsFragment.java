@@ -28,12 +28,34 @@ import com.example.securitysystemapp.databinding.FragmentMainBinding;
 import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
 
 /**
- * A placeholder fragment containing a simple view.
+ * The fragment for the Settings tab in the main activity.
  */
 public class SettingsFragment extends Fragment {
-    // Services
+//================================================================================
+// class member variables
+//================================================================================
+    // Background Service information
     TCPService mService;
     boolean mBound = false;
+
+    // UI Elements and context info
+    private Context globalContext = null;
+    private SettingsFragmentBinding binding;
+
+    // On Time Settings
+    static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
+    private TextView onTimeView;
+    private int onTimeHour;
+    private int onTimeMin;
+
+    // On Time Settings
+    static final int LIGHTS_OFF_TIME_DIALOG_ID = 1112;
+    private TextView offTimeView;
+    private int offTimeHour;
+    private int offTimeMin;
+//================================================================================
+// Service Binding Logic
+//================================================================================
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection connection = new ServiceConnection() {
 
@@ -52,31 +74,17 @@ public class SettingsFragment extends Fragment {
         }
     };
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
-    private Context globalContext = null;
 
-    // On Time Settings
-    static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
-    private TextView onTimeView;
-    private int onTimeHour;
-    private int onTimeMin;
-
-    // On Time Settings
-    static final int LIGHTS_OFF_TIME_DIALOG_ID = 1112;
-    private TextView offTimeView;
-    private int offTimeHour;
-    private int offTimeMin;
-
-//    private PageViewModel pageViewModel;
-    private SettingsFragmentBinding binding;
-
+//================================================================================
+// Native Fragment Implementations
+//================================================================================
     public static SettingsFragment newInstance(int index) {
         SettingsFragment fragment = new SettingsFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(ARG_SECTION_NUMBER, index);
         fragment.setArguments(bundle);
         return fragment;
     }
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -85,6 +93,7 @@ public class SettingsFragment extends Fragment {
         binding = SettingsFragmentBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // OnTime Setup
         onTimeView = binding.lightOnScheduleTime;
         onTimeView.setText("Extracting from security system...");
         onTimeView.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +103,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        // Off time setup
         offTimeView = binding.lightOffScheduleTime;
         offTimeView.setText("Extracting from security system...");
         offTimeView.setOnClickListener(new View.OnClickListener() {
@@ -113,15 +123,16 @@ public class SettingsFragment extends Fragment {
         // Bind to LocalService
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-//        pageViewModel = new ViewModelProvider(this).get(PageViewModel.class);
-//        int index = 1;
-//        if (getArguments() != null) {
-//            index = getArguments().getInt(ARG_SECTION_NUMBER);
-//        }
-//        pageViewModel.setIndex(index);
-
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+//================================================================================
+// Time Dialog Function
+//================================================================================
     protected Dialog createdDialog(int id) {
         switch (id) {
             case LIGHTS_ON_TIME_DIALOG_ID:
@@ -138,14 +149,6 @@ public class SettingsFragment extends Fragment {
             onTimeHour = hourOfDay;
             onTimeMin = minutes;
             onTimeView.setText(getTimeString(onTimeHour, onTimeMin));
-
-            String result =  mService.getMyString();
-            Log.i("OUTPUT",result);
-            mService.sendDataToSystem("Hi Dad!");
-//            SharedPreferences.Editor editor = sharedpreferences.edit();
-//            editor.putInt(StartTimeHour, hr);
-//            editor.putInt(StartTimeMin, min);
-//            editor.commit();
         }
     };
     private TimePickerDialog.OnTimeSetListener offTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
@@ -190,10 +193,4 @@ public class SettingsFragment extends Fragment {
     }
 
 
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
 }

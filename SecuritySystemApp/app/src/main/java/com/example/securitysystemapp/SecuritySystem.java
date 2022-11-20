@@ -5,6 +5,7 @@ import android.util.Log;
 
 public class SecuritySystem {
     public int mes_len = 26; // Number of characters in message string
+    public int control_byte = -1;
     public int alarm_armed = -1;
     public int lights = -1;
     public int light_on_hour = -1;
@@ -53,8 +54,21 @@ public class SecuritySystem {
                 alarm_armed =0;
             }
         }
-
         boolean enable_lights_on_off = isBitAtPositionSet(enable_byte, 1);
+        if (enable_lights_on_off == true)
+        {
+            int lights_byte = getByteFromHexChars(message.charAt(4), message.charAt(5));
+            if (lights_byte == 255)
+            {
+                lights = 1;
+            }
+            else
+            {
+                lights =0;
+            }
+        }
+
+
 
         boolean enable_light_on_time = isBitAtPositionSet(enable_byte, 2);
         boolean enable_light_off_time = isBitAtPositionSet(enable_byte, 3);
@@ -78,22 +92,60 @@ public class SecuritySystem {
         return byte_in_masked != 0;
     }
 
-    public String getAlarmStateString()
+
+    public String getDataToSend() {
+        control_byte = 0;
+        String returnString = getAlarmStateHexString();
+        returnString += getLightStateHexString();
+        returnString += "00"; // Lights on time min
+        returnString += "00"; // Lights on time hour
+        returnString += "00"; // Lights off time min
+        returnString += "00"; // Lights off time hour
+        returnString += "00"; // Lights Color: Blue
+        returnString += "00"; // Lights Color: green
+        returnString += "00"; // Lights Color: red
+        returnString += "00"; // Alarm audio clip
+        returnString += "00"; // Alarm triggered
+        returnString += "00"; // Alarm event
+        return getControlHexSendString() + returnString;
+    }
+
+    private String getControlHexSendString()
     {
-        String returnString = "Alarm Armed: ";
-        if (alarm_armed == 1)
+        return String.format("%02X", (0xFF & control_byte));
+
+    }
+    private String getAlarmStateHexString()
+    {
+        if(alarm_armed == 1)
         {
-            returnString += "On";
-        }
-        else if (alarm_armed == 0)
-        {
-            returnString += "Off";
+            control_byte = control_byte | 0x1;
+            return "FF";
         }
         else
         {
-            returnString += "Unknown";
+            if (alarm_armed == 0)
+            {
+                control_byte = control_byte | 0x1;
+            }
+            return "00";
         }
-        return returnString;
-
     }
+    private String getLightStateHexString()
+    {
+        if(lights == 1)
+        {
+            control_byte = control_byte | 0x3;
+            return "FF";
+        }
+        else
+        {
+            if (lights == 0)
+            {
+                control_byte = control_byte | 0x3;
+            }
+            return "00";
+        }
+    }
+
 }
