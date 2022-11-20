@@ -1,5 +1,6 @@
 package com.example.securitysystemapp;
 
+import android.content.Intent;
 import android.util.Log;
 
 public class SecuritySystem {
@@ -59,10 +60,6 @@ public class SecuritySystem {
         boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
         boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
-
-
-//        String binaryString = Integer.toBinaryString(enable_byte_msb_int);
-
     }
     public int getByteFromHexChars(Character msb, Character lsb)
     {
@@ -78,5 +75,24 @@ public class SecuritySystem {
         int bit_mask = 1 << (position_of_interest);
         int byte_in_masked = byte_in & bit_mask;
         return byte_in_masked != 0;
+    }
+
+    public String getAlarmStateString()
+    {
+        String returnString = "Alarm Armed: ";
+        if (alarm_armed == 1)
+        {
+            returnString += "On";
+        }
+        else if (alarm_armed == 0)
+        {
+            returnString += "Off";
+        }
+        else
+        {
+            returnString += "Unknown";
+        }
+        return returnString;
+
     }
 }
