@@ -76,6 +76,23 @@ public class ControlFragment extends Fragment {
                 binding.alarmToggleButton.setText("Alarm Armed: Unknown");
             }
         }
+        if (secState.lights == 1)
+        {
+            binding.lightsToggleButton.setChecked(true);
+            binding.lightsToggleButton.setText("Alarm Armed: On");
+        }
+        else
+        {
+            binding.lightsToggleButton.setChecked(false);
+            if (secState.alarm_armed == 0)
+            {
+                binding.lightsToggleButton.setText("Alarm Armed: Off");
+            }
+            else
+            {
+                binding.lightsToggleButton.setText("Alarm Armed: Unknown");
+            }
+        }
     }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection connection = new ServiceConnection() {
@@ -143,12 +160,27 @@ public class ControlFragment extends Fragment {
 
         // Setup Alarm toggle Button
         ToggleButton alarmToggle = binding.alarmToggleButton;
+        alarmToggle.setText("Alarm Control: Unknown");
         alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked)
                 {mService.securitySysState.alarm_armed = 1;}
                 else{
                     mService.securitySysState.alarm_armed = 0;
+                }
+                mService.sendSetStateToSystem();
+            }
+        });
+
+        // Setup Lights toggle button
+        ToggleButton lightsToggle = binding.lightsToggleButton;
+        lightsToggle.setText("Lights Control: Unknown");
+        lightsToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                {mService.securitySysState.lights = 1;}
+                else{
+                    mService.securitySysState.lights = 0;
                 }
                 mService.sendSetStateToSystem();
             }

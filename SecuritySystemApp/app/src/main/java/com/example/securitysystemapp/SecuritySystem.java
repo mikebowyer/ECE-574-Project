@@ -111,6 +111,10 @@ public class SecuritySystem {
         }
         else
         {
+            if (alarm_armed == 0)
+            {
+                control_byte = control_byte | 0x1;
+            }
             return "00";
         }
     }
@@ -123,6 +127,10 @@ public class SecuritySystem {
         }
         else
         {
+            if (lights == 0)
+            {
+                control_byte = control_byte | 0x3;
+            }
             return "00";
         }
     }
