@@ -86,14 +86,14 @@ public class TCPService extends Service {
             while(true) {
 
                 boolean connectAttempt = (clientSocket == null);
-                if (!connectAttempt)
-                {
-                    output.println("heartbeat");
-                    if (output.checkError())
-                    {
-                        connectAttempt = true;
-                    }
-                }
+//                if (!connectAttempt)
+//                {
+//                    output.println("heartbeat");
+//                    if (output.checkError())
+//                    {
+//                        connectAttempt = true;
+//                    }
+//                }
 
                 if (connectAttempt) {
                     try {
@@ -204,6 +204,12 @@ public class TCPService extends Service {
 
     /** method for clients */
     public void sendDataToSystem(String dataToSend) {
+        SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
+        new Thread(senderThread).start();
+    }
+
+    public void sendSetStateToSystem() {
+        String dataToSend = securitySysState.getDataToSend();
         SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
         new Thread(senderThread).start();
     }

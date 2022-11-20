@@ -79,4 +79,26 @@ public class SecuritySystem {
     }
 
 
+    public String getDataToSend() {
+        String returnString = getControlSendString();
+        returnString += getAlarmStateSendString();
+        return returnString;
+    }
+
+    private String getControlSendString()
+    {
+        return "00";
+    }
+    private String getAlarmStateSendString()
+    {
+        if(alarm_armed == 1)
+        {
+            return "FF";
+        }
+        else
+        {
+            return "00";
+        }
+    }
+
 }

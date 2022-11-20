@@ -145,7 +145,12 @@ public class ControlFragment extends Fragment {
         ToggleButton alarmToggle = binding.alarmToggleButton;
         alarmToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mService.sendDataToSystem("FromControl!");
+                if (isChecked)
+                {mService.securitySysState.alarm_armed = 1;}
+                else{
+                    mService.securitySysState.alarm_armed = 0;
+                }
+                mService.sendSetStateToSystem();
             }
         });
 
