@@ -26,8 +26,8 @@ indicating the reciever should ignore its value.
 | 0x4         | Light Color Green      | 0x00-0xFF                                          | 4                         |
 | 0x4         | Light Color Red        | 0x00-0xFF                                          | 4                         |
 | 0x4         | Alarm Audio Clip Enum  | Enumeration of Audio Clips (0-3)                   | 5                         |
-| 0x5         | Alarm triggering event | 0x00 Unknown, 0x01 Window/Door, 0x02 Motion Sensor | 6                         |
 | 0x5         | Alarm is triggered     | 0x00 for off, 0xFF for on                          | 6                         |
+| 0x5         | Alarm triggering event | 0x00 Unknown, 0x01 Window/Door, 0x02 Motion Sensor | 6                         |
 
 ## Examples of Packet Transmission
 ### Turn Lights On

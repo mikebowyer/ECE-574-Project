@@ -54,8 +54,21 @@ public class SecuritySystem {
                 alarm_armed =0;
             }
         }
-
         boolean enable_lights_on_off = isBitAtPositionSet(enable_byte, 1);
+        if (enable_lights_on_off == true)
+        {
+            int lights_byte = getByteFromHexChars(message.charAt(4), message.charAt(5));
+            if (lights_byte == 255)
+            {
+                lights = 1;
+            }
+            else
+            {
+                lights =0;
+            }
+        }
+
+
 
         boolean enable_light_on_time = isBitAtPositionSet(enable_byte, 2);
         boolean enable_light_off_time = isBitAtPositionSet(enable_byte, 3);

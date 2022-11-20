@@ -21,7 +21,7 @@ class SecurityMessage:
     def reset_everything(self):
         self.control = 0x00
         self.alarm_state = 0x00
-        self.lights = 0x00
+        self.light_state = 0x00
         self.light_on_hour = 0x00
         self.light_on_min = 0x00
         self.light_off_hour = 0x00
@@ -37,7 +37,7 @@ class SecurityMessage:
         string_to_send = ""
         string_to_send+=f'{self.control:02x}' # Left Most
         string_to_send+=f'{self.alarm_state:02x}'
-        string_to_send+=f'{self.lights:02x}'
+        string_to_send+=f'{self.light_state:02x}'
         string_to_send+=f'{self.light_on_min:02x}'
         string_to_send+=f'{self.light_on_hour:02x}'
         string_to_send+=f'{self.light_off_min:02x}'
