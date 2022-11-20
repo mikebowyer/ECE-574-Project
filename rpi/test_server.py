@@ -32,7 +32,7 @@ def server_program():
     bytestream = bytes(string_to_send, 'utf-8')
     while True:
 
-        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, r=reset')
+        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, reset=reset')
         if "e" in data:
             exit
         elif "r" in data:
@@ -54,7 +54,7 @@ def server_program():
             conn.send(bytestream)
         elif "c" in data:            
             security_sys_state.set_alarm_state(True)
-        elif "r" in data:
+        elif "reset" in data:
             security_sys_state.reset_everything()
         else:
             pass

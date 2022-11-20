@@ -5,6 +5,7 @@ import android.util.Log;
 
 public class SecuritySystem {
     public int mes_len = 26; // Number of characters in message string
+    public int control_byte = -1;
     public int alarm_armed = -1;
     public int lights = -1;
     public int light_on_hour = -1;
@@ -80,19 +81,44 @@ public class SecuritySystem {
 
 
     public String getDataToSend() {
-        String returnString = getControlSendString();
-        returnString += getAlarmStateSendString();
-        return returnString;
+        control_byte = 0;
+        String returnString = getAlarmStateHexString();
+        returnString += getLightStateHexString();
+        returnString += "00"; // Lights on time min
+        returnString += "00"; // Lights on time hour
+        returnString += "00"; // Lights off time min
+        returnString += "00"; // Lights off time hour
+        returnString += "00"; // Lights Color: Blue
+        returnString += "00"; // Lights Color: green
+        returnString += "00"; // Lights Color: red
+        returnString += "00"; // Alarm audio clip
+        returnString += "00"; // Alarm triggered
+        returnString += "00"; // Alarm event
+        return getControlHexSendString() + returnString;
     }
 
-    private String getControlSendString()
+    private String getControlHexSendString()
     {
-        return "00";
+        return String.format("%02X", (0xFF & control_byte));
+
     }
-    private String getAlarmStateSendString()
+    private String getAlarmStateHexString()
     {
         if(alarm_armed == 1)
         {
+            control_byte = control_byte | 0x1;
+            return "FF";
+        }
+        else
+        {
+            return "00";
+        }
+    }
+    private String getLightStateHexString()
+    {
+        if(lights == 1)
+        {
+            control_byte = control_byte | 0x3;
             return "FF";
         }
         else
