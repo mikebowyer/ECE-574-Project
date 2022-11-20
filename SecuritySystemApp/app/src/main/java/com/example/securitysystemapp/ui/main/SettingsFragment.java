@@ -2,9 +2,14 @@ package com.example.securitysystemapp.ui.main;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +31,26 @@ import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
  * A placeholder fragment containing a simple view.
  */
 public class SettingsFragment extends Fragment {
+    // Services
+    TCPService mService;
+    boolean mBound = false;
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection connection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            TCPService.LocalBinder binder = (TCPService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Context globalContext = null;
@@ -85,6 +110,10 @@ public class SettingsFragment extends Fragment {
         globalContext = this.getActivity();
         super.onCreate(savedInstanceState);
 
+        // Bind to LocalService
+        Intent intent = new Intent(globalContext, TCPService.class);
+        globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
 //        pageViewModel = new ViewModelProvider(this).get(PageViewModel.class);
 //        int index = 1;
 //        if (getArguments() != null) {
@@ -109,6 +138,10 @@ public class SettingsFragment extends Fragment {
             onTimeHour = hourOfDay;
             onTimeMin = minutes;
             onTimeView.setText(getTimeString(onTimeHour, onTimeMin));
+
+            String result =  mService.getMyString();
+            Log.i("OUTPUT",result);
+            mService.sendDataToSystem("Hi Dad!");
 //            SharedPreferences.Editor editor = sharedpreferences.edit();
 //            editor.putInt(StartTimeHour, hr);
 //            editor.putInt(StartTimeMin, min);
