@@ -155,6 +155,12 @@ public class TCPService extends Service {
                     String result = input.readLine();
                     Log.i("RecieverRunnable",result);
                     securitySysState.setStateWithReceivedPacket(result);
+
+                    // send broadcast
+                    Intent intent = new Intent();
+                    intent.setAction("recieved_new_data");
+                    intent.putExtra("MyData", 1000);
+                    sendBroadcast(intent);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

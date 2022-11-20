@@ -1,8 +1,10 @@
 package com.example.securitysystemapp.ui.main;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -40,6 +42,18 @@ public class ControlFragment extends Fragment {
     private Context globalContext = null;
 
     boolean mBound = false;
+    public class MyReceiver extends BroadcastReceiver {
+
+        public MyReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Implement code here to be performed when
+            // broadcast is detected
+            Log.i("test","test");
+        }
+    }
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection connection = new ServiceConnection() {
 
@@ -84,6 +98,12 @@ public class ControlFragment extends Fragment {
         globalContext = this.getActivity();
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        //
+        IntentFilter filter = new IntentFilter("recieved_new_data");
+        MyReceiver receiver = new MyReceiver();
+        globalContext.registerReceiver(receiver, filter);
+
 
         super.onCreate(savedInstanceState);
 
