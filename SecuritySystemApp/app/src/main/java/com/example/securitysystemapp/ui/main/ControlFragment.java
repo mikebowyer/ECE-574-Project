@@ -49,12 +49,6 @@ public class ControlFragment extends Fragment {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             TCPService.LocalBinder binder = (TCPService.LocalBinder) service;
             mService = binder.getService();
-            binder.addListener(new TCPService.myCallback(){
-                @Override
-                public void onCalled(int parameter) {
-                    Log.i("test","test");
-                }
-            });
 
 
             if(mService != null){
