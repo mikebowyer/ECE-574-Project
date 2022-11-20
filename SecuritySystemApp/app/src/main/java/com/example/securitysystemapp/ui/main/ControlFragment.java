@@ -51,7 +51,30 @@ public class ControlFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             // Implement code here to be performed when
             // broadcast is detected
-            Log.i("test","test");
+            Log.i("ControlFragment","Received message, updating view.");
+            SecuritySystem secState = mService.getSecuritySystemState();
+            updateView(secState);
+        }
+    }
+
+    public void updateView(SecuritySystem secState)
+    {
+        if (secState.alarm_armed == 1)
+        {
+            binding.alarmToggleButton.setChecked(true);
+            binding.alarmToggleButton.setText("Alarm Armed: On");
+        }
+        else
+        {
+            binding.alarmToggleButton.setChecked(false);
+            if (secState.alarm_armed == 0)
+            {
+                binding.alarmToggleButton.setText("Alarm Armed: Off");
+            }
+            else
+            {
+                binding.alarmToggleButton.setText("Alarm Armed: Unknown");
+            }
         }
     }
     /** Defines callbacks for service binding, passed to bindService() */

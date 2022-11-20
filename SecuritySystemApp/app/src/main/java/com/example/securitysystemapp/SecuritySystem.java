@@ -78,22 +78,5 @@ public class SecuritySystem {
         return byte_in_masked != 0;
     }
 
-    public String getAlarmStateString()
-    {
-        String returnString = "Alarm Armed: ";
-        if (alarm_armed == 1)
-        {
-            returnString += "On";
-        }
-        else if (alarm_armed == 0)
-        {
-            returnString += "Off";
-        }
-        else
-        {
-            returnString += "Unknown";
-        }
-        return returnString;
 
-    }
 }

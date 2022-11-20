@@ -197,6 +197,11 @@ public class TCPService extends Service {
         return myString;
     }
 
+    public SecuritySystem getSecuritySystemState()
+    {
+        return securitySysState;
+    }
+
     /** method for clients */
     public void sendDataToSystem(String dataToSend) {
         SenderThread senderThread = new SenderThread(clientSocket, dataToSend);
