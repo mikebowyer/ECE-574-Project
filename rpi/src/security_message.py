@@ -16,6 +16,7 @@ class SecurityMessage:
     def __init__(self):
         self.reset_everything()
         self.set_alarm_state(False)
+        self.set_light_state(False)
 
     def reset_everything(self):
         self.control = 0x00

@@ -32,10 +32,11 @@ def server_program():
     bytestream = bytes(string_to_send, 'utf-8')
     while True:
 
-        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, reset=reset')
+        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, reset=reset\n')
         if "e" in data:
             exit
         elif "r" in data:
+            print("Recieving latest data from app:\n")
             try:
                 recieved_str = ""
                 next_byte = ""
@@ -48,11 +49,14 @@ def server_program():
                 print(recieved_str)
             except: 
                 pass
-        elif "s" in data:            
+        elif "s" in data:
+            print("Sending current system state to app:\n")         
             string_to_send = security_sys_state.assemble_packet_to_send()
             bytestream = bytes(string_to_send, 'utf-8')
             conn.send(bytestream)
-        elif "c" in data:            
+        elif "c" in data:
+            print("Changing Alaram and light state!:\n")       
+            security_sys_state.set_alarm_state(True)
             security_sys_state.set_alarm_state(True)
         elif "reset" in data:
             security_sys_state.reset_everything()

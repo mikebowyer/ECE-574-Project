@@ -31,7 +31,7 @@ import com.example.securitysystemapp.databinding.ControlFragmentBinding;
 import com.example.securitysystemapp.databinding.FragmentMainBinding;
 
 /**
- * The fragement for the Control tab in the main activity.
+ * The fragment for the Control tab in the main activity.
  */
 public class ControlFragment extends Fragment {
 
