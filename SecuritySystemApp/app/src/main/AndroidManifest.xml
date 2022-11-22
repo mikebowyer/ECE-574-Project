@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SecuritySystemApp"
         tools:targetApi="31">
-        <receiver android:name="MyReceiver"
+        <receiver android:name="ControlReciever"
             android:exported="false">
             <intent-filter>
-                <action android:name="recieved_new_data" >
+                <action android:name="control_data" >
                 </action>
             </intent-filter>
         </receiver>

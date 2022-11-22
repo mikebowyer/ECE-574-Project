@@ -160,7 +160,7 @@ public class TCPService extends Service {
 
                     // send broadcast
                     Intent control_intent = new Intent();
-                    control_intent.setAction("recieved_new_data");
+                    control_intent.setAction("control_data");
                     sendBroadcast(control_intent);
 
                     // send broadcast of settings
