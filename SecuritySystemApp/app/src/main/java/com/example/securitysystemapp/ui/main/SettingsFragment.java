@@ -45,14 +45,14 @@ public class SettingsFragment extends Fragment {
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
     private TextView onTimeView;
-    private int onTimeHour;
-    private int onTimeMin;
+    private int onTimeHour = 12;
+    private int onTimeMin = 0;
 
-    // On Time Settings
+    // Off Time Settings
     static final int LIGHTS_OFF_TIME_DIALOG_ID = 1112;
     private TextView offTimeView;
-    private int offTimeHour;
-    private int offTimeMin;
+    private int offTimeHour = 12;
+    private int offTimeMin = 0;
 //================================================================================
 // Service Binding Logic
 //================================================================================
@@ -95,7 +95,7 @@ public class SettingsFragment extends Fragment {
 
         // OnTime Setup
         onTimeView = binding.lightOnScheduleTime;
-        onTimeView.setText("Extracting from security system...");
+        onTimeView.setText("Unknown");
         onTimeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +105,7 @@ public class SettingsFragment extends Fragment {
 
         // Off time setup
         offTimeView = binding.lightOffScheduleTime;
-        offTimeView.setText("Extracting from security system...");
+        offTimeView.setText("Unknown");
         offTimeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,23 +146,28 @@ public class SettingsFragment extends Fragment {
     private TimePickerDialog.OnTimeSetListener onTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minutes) {
+            // Update UI Components
             onTimeHour = hourOfDay;
             onTimeMin = minutes;
             onTimeView.setText(getTimeString(onTimeHour, onTimeMin));
+
+            // Inform Security System of change
+            mService.securitySysState.light_on_min = minutes;
+            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.sendSetStateToSystem();
         }
     };
     private TimePickerDialog.OnTimeSetListener offTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minutes) {
-            // TODO Auto-generated method stub
+            // Update UI Components
             offTimeHour = hourOfDay;
             offTimeMin = minutes;
             offTimeView.setText(getTimeString(offTimeHour, offTimeMin));
-//            SharedPreferences.Editor editor = sharedpreferences.edit();
-//            editor.putInt(StartTimeHour, hr);
-//            editor.putInt(StartTimeMin, min);
-//            editor.commit();
-        }
+            // Inform Security System of change
+            mService.securitySysState.light_on_min = minutes;
+            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.sendSetStateToSystem();        }
     };
     private static String utilTime(int value) {
         if (value < 10) return "0" + String.valueOf(value);
