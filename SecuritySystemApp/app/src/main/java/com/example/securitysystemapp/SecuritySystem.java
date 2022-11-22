@@ -68,11 +68,19 @@ public class SecuritySystem {
                 lights =0;
             }
         }
-
-
-
         boolean enable_light_on_time = isBitAtPositionSet(enable_byte, 2);
+        if (enable_light_on_time == true)
+        {
+            light_on_min = getByteFromHexChars(message.charAt(6), message.charAt(7));
+            light_on_hour = getByteFromHexChars(message.charAt(8), message.charAt(9));
+        }
+
         boolean enable_light_off_time = isBitAtPositionSet(enable_byte, 3);
+        if (enable_light_off_time == true)
+        {
+            light_off_min = getByteFromHexChars(message.charAt(10), message.charAt(11));
+            light_off_hour = getByteFromHexChars(message.charAt(12), message.charAt(13));
+        }
         boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
         boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);

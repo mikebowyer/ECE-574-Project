@@ -145,7 +145,7 @@ public class ControlFragment extends Fragment {
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        //
+        // Setup Broadcast reciever
         IntentFilter filter = new IntentFilter("recieved_new_data");
         MyReceiver receiver = new MyReceiver();
         globalContext.registerReceiver(receiver, filter);

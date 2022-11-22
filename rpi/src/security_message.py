@@ -17,6 +17,8 @@ class SecurityMessage:
         self.reset_everything()
         self.set_alarm_state(False)
         self.set_light_state(False)
+        self.set_lights_on_time(13,20)
+        self.set_lights_off_time(2,47)
 
     def reset_everything(self):
         self.control = 0x00
@@ -65,3 +67,14 @@ class SecurityMessage:
             self.light_state = 0xFF
         else:
             self.light_state = 0x00
+
+    def set_lights_on_time(self, hour, min):
+        self.control = self.control | 0x04
+        self.light_on_hour = hour
+        self.light_on_min = min
+    
+    def set_lights_off_time(self, hour, min):
+        self.control = self.control | 0x08
+        self.light_off_hour = hour
+        self.light_off_min = min
+

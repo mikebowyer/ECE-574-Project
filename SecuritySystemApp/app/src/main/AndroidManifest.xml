@@ -19,6 +19,13 @@
                 </action>
             </intent-filter>
         </receiver>
+        <receiver android:name="SettingsReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="settings_data" >
+                </action>
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:exported="true"

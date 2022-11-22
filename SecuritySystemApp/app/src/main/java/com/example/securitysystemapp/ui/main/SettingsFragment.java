@@ -2,9 +2,11 @@ package com.example.securitysystemapp.ui.main;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.securitysystemapp.R;
+import com.example.securitysystemapp.SecuritySystem;
 import com.example.securitysystemapp.databinding.ControlFragmentBinding;
 import com.example.securitysystemapp.databinding.FragmentMainBinding;
 import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
@@ -53,6 +56,39 @@ public class SettingsFragment extends Fragment {
     private TextView offTimeView;
     private int offTimeHour = 12;
     private int offTimeMin = 0;
+//================================================================================
+// Broadcast recieved logic
+//================================================================================
+    /**
+     * Broadcast receiver which forces all view elements to be updated.
+     */
+    public class SettingsReceiver extends BroadcastReceiver {
+
+        public SettingsReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            /**
+             * Gathers the current securty system information from the background service,
+             * and updates all UI elements with the latest value.
+             */
+            Log.i("ControlFragment","Received message, updating view.");
+            SecuritySystem secState = mService.getSecuritySystemState();
+            updateView(secState);
+        }
+    }
+
+    public void updateView(SecuritySystem secState)
+    {
+        if (secState.light_on_hour != -1 && secState.light_on_min != -1){
+            onTimeView.setText(getTimeString(secState.light_on_hour, secState.light_on_min));
+        }
+        if (secState.light_off_hour != -1 && secState.light_off_min != -1){
+            offTimeView.setText(getTimeString(secState.light_off_hour, secState.light_off_min));
+        }
+    }
+
 //================================================================================
 // Service Binding Logic
 //================================================================================
@@ -123,6 +159,11 @@ public class SettingsFragment extends Fragment {
         // Bind to LocalService
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        // Setup Broadcast receiver
+        IntentFilter filter = new IntentFilter("settings_data");
+        SettingsFragment.SettingsReceiver receiver = new SettingsReceiver();
+        globalContext.registerReceiver(receiver, filter);
     }
 
     @Override
