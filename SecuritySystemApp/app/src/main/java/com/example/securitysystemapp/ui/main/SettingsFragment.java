@@ -127,9 +127,10 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
-        Log.i("test","test");
+        if (mService != null) {
+            mService.securitySysState.selected_audio_clip = pos;
+            mService.sendSetStateToSystem();
+        }
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

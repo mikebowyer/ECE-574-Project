@@ -107,12 +107,11 @@ public class SecuritySystem {
         String returnString = getAlarmStateHexString();
         returnString += getLightStateHexString();
         returnString += getLightsOnTimeHexString();
-        returnString += "00"; // Lights off time min
-        returnString += "00"; // Lights off time hour
+        returnString += getLightsOffTimeHexString();
         returnString += "00"; // Lights Color: Blue
         returnString += "00"; // Lights Color: green
         returnString += "00"; // Lights Color: red
-        returnString += "00"; // Alarm audio clip
+        returnString += getSelectedAudioClipHexString(); // Alarm audio clip
         returnString += "00"; // Alarm triggered
         returnString += "00"; // Alarm event
         return getControlHexSendString() + returnString;
@@ -168,6 +167,34 @@ public class SecuritySystem {
         else
         {
             return "0000";
+        }
+    }
+    private String getLightsOffTimeHexString()
+    {
+        if(light_off_min != -1 && light_off_hour != -1)
+            {
+                control_byte = control_byte | 0x8;
+                String min_hex = String.format("%02X", (0xFF & light_off_min));
+                String hour_hex = String.format("%02X", (0xFF & light_off_hour));
+
+                return min_hex + hour_hex;
+            }
+            else
+            {
+                return "0000";
+        }
+    }
+
+    private String getSelectedAudioClipHexString()
+    {
+        if(selected_audio_clip != -1)
+        {
+            control_byte = control_byte | 0x10;
+            return String.format("%02X", (0xFF & selected_audio_clip));
+        }
+        else
+        {
+            return "00";
         }
     }
 
