@@ -58,7 +58,9 @@ def server_program():
             print("Changing Alaram and light state!:\n")       
             # security_sys_state.set_alarm_state(True)
             # security_sys_state.set_light_state(True)
-            security_sys_state.set_selected_audio_clip(2)
+            security_sys_state.set_lights_on_time(1,1)
+            security_sys_state.set_lights_off_time(2,2)
+            # security_sys_state.set_selected_audio_clip(2)
         elif "reset" in data:
             security_sys_state.reset_everything()
         else:

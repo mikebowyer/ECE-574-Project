@@ -17,9 +17,9 @@ class SecurityMessage:
         self.reset_everything()
         # self.set_alarm_state(False)
         # self.set_light_state(False)
-        # self.set_lights_on_time(13,20)
-        # self.set_lights_off_time(2,47)
-        self.set_selected_audio_clip(3)
+        self.set_lights_on_time(13,20)
+        self.set_lights_off_time(2,47)
+        # self.set_selected_audio_clip(3)
 
     def reset_everything(self):
         self.control = 0x00

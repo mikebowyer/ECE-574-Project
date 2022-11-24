@@ -251,8 +251,8 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
             offTimeMin = minutes;
             offTimeView.setText(getTimeString(offTimeHour, offTimeMin));
             // Inform Security System of change
-            mService.securitySysState.light_on_min = minutes;
-            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.securitySysState.light_off_min = minutes;
+            mService.securitySysState.light_off_hour = hourOfDay;
             mService.sendSetStateToSystem();        }
     };
     private static String utilTime(int value) {
