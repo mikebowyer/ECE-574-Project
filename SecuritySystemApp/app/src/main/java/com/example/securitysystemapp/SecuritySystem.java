@@ -83,6 +83,10 @@ public class SecuritySystem {
         }
         boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
         boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
+        if (enable_alarm_audio_clip == true)
+        {
+            selected_audio_clip = getByteFromHexChars(message.charAt(20), message.charAt(21));
+        }
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
     }
     public int getByteFromHexChars(Character msb, Character lsb)
@@ -189,7 +193,7 @@ public class SecuritySystem {
     {
         if(selected_audio_clip != -1)
         {
-            control_byte = control_byte | 0x10;
+            control_byte = control_byte | 0x20;
             return String.format("%02X", (0xFF & selected_audio_clip));
         }
         else

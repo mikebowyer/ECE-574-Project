@@ -49,6 +49,10 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
     private Context globalContext = null;
     private SettingsFragmentBinding binding;
 
+    // Spinner
+    private Spinner spinner;
+    private volatile boolean update_from_broadcast;
+
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
     private TextView onTimeView;
@@ -60,6 +64,8 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
     private TextView offTimeView;
     private int offTimeHour = 12;
     private int offTimeMin = 0;
+
+
 //================================================================================
 // Broadcast recieved logic
 //================================================================================
@@ -91,6 +97,11 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         if (secState.light_off_hour != -1 && secState.light_off_min != -1){
             offTimeView.setText(getTimeString(secState.light_off_hour, secState.light_off_min));
         }
+        if (secState.selected_audio_clip != -1){
+            spinner.setSelection(secState.selected_audio_clip);
+            update_from_broadcast = true;
+        }
+
     }
 
 //================================================================================
@@ -128,8 +139,13 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         if (mService != null) {
-            mService.securitySysState.selected_audio_clip = pos;
-            mService.sendSetStateToSystem();
+            if (! update_from_broadcast) {
+                mService.securitySysState.selected_audio_clip = pos;
+                mService.sendSetStateToSystem();
+            }
+            else{
+                update_from_broadcast= false;
+            }
         }
     }
 
@@ -167,7 +183,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
         });
 
         // Setup Dropdown menu
-        Spinner spinner = binding.alarmNoiseDropDown;
+        spinner = binding.alarmNoiseDropDown;
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(globalContext,
                 R.array.alarm_sounds_array, android.R.layout.simple_spinner_item);

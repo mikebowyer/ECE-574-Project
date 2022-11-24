@@ -15,10 +15,11 @@ class SecurityMessage:
 
     def __init__(self):
         self.reset_everything()
-        self.set_alarm_state(False)
-        self.set_light_state(False)
-        self.set_lights_on_time(13,20)
-        self.set_lights_off_time(2,47)
+        # self.set_alarm_state(False)
+        # self.set_light_state(False)
+        # self.set_lights_on_time(13,20)
+        # self.set_lights_off_time(2,47)
+        self.set_selected_audio_clip(3)
 
     def reset_everything(self):
         self.control = 0x00
@@ -78,3 +79,6 @@ class SecurityMessage:
         self.light_off_hour = hour
         self.light_off_min = min
 
+    def set_selected_audio_clip(self, clip_num):
+        self.control = self.control | 0x20
+        self.selected_audio_clip = clip_num

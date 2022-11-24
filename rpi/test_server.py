@@ -56,8 +56,9 @@ def server_program():
             conn.send(bytestream)
         elif "c" in data:
             print("Changing Alaram and light state!:\n")       
-            security_sys_state.set_alarm_state(True)
-            security_sys_state.set_light_state(True)
+            # security_sys_state.set_alarm_state(True)
+            # security_sys_state.set_light_state(True)
+            security_sys_state.set_selected_audio_clip(2)
         elif "reset" in data:
             security_sys_state.reset_everything()
         else:

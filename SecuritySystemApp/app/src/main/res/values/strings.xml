@@ -7,7 +7,7 @@
     <string name="light_on_text">Lights On Scheduled Time:</string>
     <string name="light_off_text">Lights Off Scheduled Time:</string>
     <string-array name="alarm_sounds_array">
-        <item>Default</item>
+        <item>Unset</item>
         <item>Spooky</item>
         <item>Alarm</item>
         <item>Screams</item>
