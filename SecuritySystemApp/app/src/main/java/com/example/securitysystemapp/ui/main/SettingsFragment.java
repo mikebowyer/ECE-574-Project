@@ -1,5 +1,6 @@
 package com.example.securitysystemapp.ui.main;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
@@ -15,6 +16,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -33,7 +37,7 @@ import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
 /**
  * The fragment for the Settings tab in the main activity.
  */
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 //================================================================================
 // class member variables
 //================================================================================
@@ -121,6 +125,18 @@ public class SettingsFragment extends Fragment {
         return fragment;
     }
 
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        // parent.getItemAtPosition(pos)
+        Log.i("test","test");
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -148,6 +164,18 @@ public class SettingsFragment extends Fragment {
                 createdDialog(LIGHTS_OFF_TIME_DIALOG_ID).show();
             }
         });
+
+        // Setup Dropdown menu
+        Spinner spinner = binding.alarmNoiseDropDown;
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(globalContext,
+                R.array.alarm_sounds_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
         return root;
     }
 
