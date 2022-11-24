@@ -125,7 +125,7 @@ def main():
                 neopixelInterface.activateWindowAlarmMode()
                 
         if(useWindowSensor):
-            #p rint("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
+            #print("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
             alarmTripped = alarmTripped or windowSensorInterface.alarmTripped()
             alarmReadyForReset = alarmReadyForReset and (not windowSensorInterface.alarmTripped())
             
