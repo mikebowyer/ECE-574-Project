@@ -6,17 +6,20 @@ import neopixel_interface
 import motion_sensor_interface
 import window_sensor_interface
 import alarm_audio_interface
+import data_repository
+
+DATA_REPO = data_repository.DataRepository()
 
 SERVER_ADDR = "192.168.1.8"
 SERVER_PORT = 5000
 
-reset = False
-terminate = False
+RESET = False
+TERMINATE = False
 
-def user_interface_read():
-    global terminate
-    global reset
-    while(not terminate):
+def runUserInterface():
+    global TERMINATE
+    global RESET
+    while(not TERMINATE):
         userInput = input("""
 /////////////////////////////
 Enter:
@@ -24,22 +27,25 @@ r) reset system
 q) quit
 ////////////////////////////\n""")
         if(userInput == "r"):
-            reset = True
+            RESET = True
         elif(userInput == "q"):
-            terminate = True
+            TERMINATE = True
         else:
             print("[ERROR] Invalid input in userInput")
         
 def main():
-    global reset
+    global DATA_REPO
+    global RESET
     
     #Testing Configuration
+    #NOTE 1: NeoPixels needs to run as root
+    #NOTE 2: AlarmAudio (Pydub) causes issues when run as root (currently...need to fix this)
     useUserInterface = True
     useSockets = False
     useNeoPixels = False
     useMotionSensor = False
-    useWindowSensor = True
-    useAlarmAudio = True #Not working
+    useWindowSensor = False
+    useAlarmAudio = False
     
     #NeoPixel Interface
     neopixelInterface = None
@@ -61,23 +67,23 @@ def main():
     if(useNeoPixels):
         neopixelInterface = neopixel_interface.NeopixelInterface()
         neopixelInterface.init()
-        neopixelThread = threading.Thread(target=neopixelInterface.runPixels, args=())
+        neopixelThread = threading.Thread(target=neopixelInterface.runNeoPixelInteface, args=())
         neopixelThread.start()
         
     if(useMotionSensor):
         motionSensorInterface = motion_sensor_interface.MotionSensorInterface()
         motionSensorInterface.init()
-        motionSensorThread = threading.Thread(target=motionSensorInterface.runSensor, args=())
+        motionSensorThread = threading.Thread(target=motionSensorInterface.runSensorInterface, args=())
         motionSensorThread.start()
     
     if(useWindowSensor):
         windowSensorInterface = window_sensor_interface.WindowSensorInterface()
         windowSensorInterface.init()
-        windowSensorThread = threading.Thread(target=windowSensorInterface.runSensor, args=())
+        windowSensorThread = threading.Thread(target=windowSensorInterface.runSensorInterface, args=())
         windowSensorThread.start()
 
     if(useUserInterface):
-        userInterfaceThread = threading.Thread(target=user_interface_read, args=())
+        userInterfaceThread = threading.Thread(target=runUserInterface, args=())
         userInterfaceThread.start()
     
     if(useSockets):
@@ -100,12 +106,12 @@ def main():
     prevAlarmTripped = False
     
     prevAlarmReadyForReset = True
-    while not terminate:
+    while not TERMINATE:
         alarmReadyForReset = True #reset ready unless proven otherwise
         
-        if(reset):
+        if(RESET):
             alarmTripped = False
-            reset = False
+            RESET = False
             alarmAudioInterface.resetMode()
         
         if(useMotionSensor):
@@ -126,7 +132,7 @@ def main():
             if(useAlarmAudio and alarmTripped):
                 alarmAudioInterface.activateAlarmSound()
                 
-            if(useNeoPixels and alarmTripped()):
+            if(useNeoPixels and alarmTripped):
                 neopixelInterface.activateWindowAlarmMode()
         
         if(alarmTripped):

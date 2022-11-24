@@ -15,7 +15,7 @@ class WindowSensorInterface:
         testInput = GPIO.input(self.inputPin) #0 = window closed, 1 = window open
         print(testInput)
         
-    def runSensor(self):
+    def runSensorInterface(self):
         trippedCounter = 0
         while not self.terminate:
             sensorInput = GPIO.input(self.inputPin)

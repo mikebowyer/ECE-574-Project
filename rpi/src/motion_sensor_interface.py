@@ -15,7 +15,7 @@ class MotionSensorInterface:
         testInput = GPIO.input(self.inputPin) #0 = window closed, 1 = window open
         print(testInput)
         
-    def runSensor(self):
+    def runSensorInterface(self):
         trippedCounter = 0
         initializedCount = 0
         initialized = False
