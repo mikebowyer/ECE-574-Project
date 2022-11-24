@@ -9,10 +9,11 @@ class NeopixelInterface:
     terminate = False
     def init(self):
         self.pixels = neopixel.NeoPixel(board.D18, 12)
-        self.pixels.fill((127, 127, 127))
-        self.pixels.show()
-        time.sleep(.5)
+        #self.pixels.fill((127, 127, 127))
+        #self.pixels.show()
+        #time.sleep(.5)
         self.pixels.fill((0, 0, 0))
+        self.pixels.show()
         print("Initialized NeoPixels")
            
     def motionAlarm(self):
@@ -46,12 +47,6 @@ class NeopixelInterface:
                     break
                 self.pixels[i] = (0, 0, 0)
                 time.sleep(.5)    
-        
-    def runPixels(self):
-        #self.randomTest()
-        #self.motionAlarm()
-        self.windowAlarm()
-        pass
         
     def shutdown(self):
         self.terminate = True

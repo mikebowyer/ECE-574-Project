@@ -1,15 +1,16 @@
+import time
+
 import threading
-from socket_interface import *
+import tcp_interface
 
 import neopixel_interface
 import motion_sensor_interface
 import window_sensor_interface
 import alarm_audio_interface
 
-TX_ADDR = "192.168.1.12"
-TX_PORT = 5555
-RX_ADDR = "127.0.0.1"
-RX_PORT = 5555
+ANDROID_ADDR = "192.168.1.8"
+ANDROID_PORT = 5000 
+
 terminate = False
 
 def user_interface_read():
@@ -22,30 +23,9 @@ q) quit
 ////////////////////////////\n""")
         if(userInput == "q"):
             terminate = True
-
-def receive(rxSocket):
-    global terminate
-    while(not terminate):
-        print("TestRx")
-           
-def transmit(txSocket):
-    global terminate
-    global TX_ADDR
-    global TX_PORT
-    message_data = b"TESTING"
-    while(not terminate):
-        print("Sending")
-        send(message_data, txSocket, TX_ADDR, TX_PORT)
         
 def main():
-    
-    #Testing Configuration
-    useUserInterface = True
-    useSockets = False
-    useNeoPixels = False
-    useMotionSensor = True
-    useWindowSensor = False
-    useAlarmAudio = False
+    global terminate
     
     #NeoPixel Interface
     neopixInterface = None
@@ -55,72 +35,79 @@ def main():
     windowSensorInterface = None
     windowSensorThread = None
     
+    #TCP Interface
+    tcpInterface = None
+    tcpThread = None
     
-    if(useNeoPixels):
-        neopixInterface = neopixel_interface.NeopixelInterface()
-        neopixInterface.init()
-        pixelThread = threading.Thread(target=neopixInterface.runPixels, args=())
-        pixelThread.start()
-        
-    if(useMotionSensor):
-        motionSensorInterface = motion_sensor_interface.MotionSensorInterface()
-        motionSensorInterface.init()
-        motionSensorInterface.test()
-        motionSensorThread = threading.Thread(target=motionSensorInterface.runSensor, args=())
-        motionSensorThread.start()
+    #Alarm Audio Interface
+    alarmAudioInterface = alarm_audio_interface.AlarmAudioInterface()
     
-    if(useWindowSensor):
-        windowSensorInterface = window_sensor_interface.WindowSensorInterface()
-        windowSensorInterface.init()
-        windowSensorInterface.test()
-        windowSensorThread = threading.Thread(target=windowSensorInterface.runSensor, args=())
-        windowSensorThread.start()
+    #NeoPixel Interface
+    neopixInterface = neopixel_interface.NeopixelInterface()
+    neopixInterface.init()
+     
+    #Motion Sensor Interface
+    motionSensorInterface = motion_sensor_interface.MotionSensorInterface()
+    motionSensorInterface.init()
+    motionSensorThread = threading.Thread(target=motionSensorInterface.runSensor, args=())
+    motionSensorThread.start()
+    
+    #Window Sensor
+    #windowSensorInterface = window_sensor_interface.WindowSensorInterface()
+    #windowSensorInterface.init()
+    #windowSensorInterface.test()
+    #windowSensorThread = threading.Thread(target=windowSensorInterface.runSensor, args=())
+    #windowSensorThread.start()
+    
+    #Door Sensor
+    #TODO
 
-    if(useUserInterface):
-        userInterfaceThread = threading.Thread(target=user_interface_read, args=())
-        userInterfaceThread.start()
+    #User Interface 
+    userInterfaceThread = threading.Thread(target=user_interface_read, args=())
+    userInterfaceThread.start()
     
-    if(useSockets):
-        global RX_ADDR
-        global RX_PORT
-        rxSock = createRxSocket(RX_ADDR, RX_PORT)
-        txSock = createTxSocket()
-    
-        #UDP Receive Thread
-        rx_thread = threading.Thread(target=receive, args=(rxSock,))
-        rx_thread.start()
-    
-        #UDP Transmit Thread
-        tx_thread = threading.Thread(target=transmit, args=(txSock,))
-        tx_thread.start()
+    #TCP Interface
+    global RX_ADDR
+    global RX_PORT        
+    #tcpInterface = tcp_interface.TCPInterface()
+    #tcpInterface.init(ANDROID_ADDR, ANDROID_PORT)
+    #tcpThread = threading.Thread(target=tcpInterface.server_program, args=())
+    #tcpThread.start()
         
-    if(useAlarmAudio):
-        alarmAudioInterface = alarm_audio_interface.AlarmAudioInterface()
-        alarmAudioInterface.playAlertSound()
-        alarmAudioInterface.playAlarmSound()
-
     ########################################
     #Do magical processing
     ########################################
+    while not terminate:
+        time.sleep(.1) #check at 10 Hz
+        print(str(motionSensorInterface.alarmTripped()))
+        if((motionSensorInterface.alarmTripped() == True)):
+        #if((motionSensorInterface.alarmTripped() == True) or
+        #   (windowSensorInterface.alarmTripped() == True)):
+            #alarmAudioInterface.playAlertSound()
+            neopixInterface.motionAlarm()
+    print("Exiting Main Loop")
     
-
-    #Quit first based on console input
-    if(useUserInterface):
-        userInterfaceThread.join()
-
+    ########################################
     #Thread Cleanup
-    if(useSockets):
-        rx_thread.join()
-        tx_thread.join()
+    ########################################
+    
+    #Quit first based on console input
+    userInterfaceThread.join()
         
-    #NeoPixel cleanup   
-    if(useNeoPixels):
-        neopixInterface.shutdown()
-        pixelThread.join()
-        
-    if(useWindowSensor):
-        windowSensorInterface.shutdown()
-        windowSensorThread.join()
+    #NeoPixel Cleanup   
+    neopixInterface.shutdown()
+     
+    #Window Sensor Cleanup
+    #windowSensorInterface.shutdown()
+    #windowSensorThread.join()
+    
+    #Motion Sensor Cleanup
+    motionSensorInterface.shutdown()
+    motionSensorThread.join()
+    
+    #TCP Cleanup
+    #tcpInterface.shutdown()
+    #tcpThread.join()    
         
     print("Exiting")
   
