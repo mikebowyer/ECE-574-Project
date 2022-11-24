@@ -43,9 +43,9 @@ def main():
     useUserInterface = True
     useSockets = False
     useNeoPixels = False
-    useMotionSensor = False
+    useMotionSensor = True
     useWindowSensor = False
-    useAlarmAudio = False
+    useAlarmAudio = True
     
     #NeoPixel Interface
     neopixelInterface = None
@@ -117,8 +117,8 @@ def main():
         if(useMotionSensor):
             #print(str(motionSensorInterface.alarmTripped()))
             alarmTripped = alarmTripped or motionSensorInterface.alarmTripped()
-            #alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
-            if(useAlarmAudio and alarmTripped()):
+            alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
+            if(useAlarmAudio and alarmTripped):
                 alarmAudioInterface.activateAlertSound()
                 
             if(useNeoPixels and alarmTripped()):
