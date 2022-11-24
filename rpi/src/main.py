@@ -41,9 +41,9 @@ def main():
     #NOTE 1: NeoPixels needs to run as root
     #NOTE 2: AlarmAudio (Pydub) causes issues when run as root (currently...need to fix this)
     useUserInterface = True
-    useSockets = False
+    useSockets = True
     useNeoPixels = False
-    useMotionSensor = True
+    useMotionSensor = False
     useWindowSensor = False
     useAlarmAudio = True
     
