@@ -2,9 +2,11 @@ package com.example.securitysystemapp.ui.main;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.securitysystemapp.R;
+import com.example.securitysystemapp.SecuritySystem;
 import com.example.securitysystemapp.databinding.ControlFragmentBinding;
 import com.example.securitysystemapp.databinding.FragmentMainBinding;
 import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
@@ -45,14 +48,47 @@ public class SettingsFragment extends Fragment {
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
     private TextView onTimeView;
-    private int onTimeHour;
-    private int onTimeMin;
+    private int onTimeHour = 12;
+    private int onTimeMin = 0;
 
-    // On Time Settings
+    // Off Time Settings
     static final int LIGHTS_OFF_TIME_DIALOG_ID = 1112;
     private TextView offTimeView;
-    private int offTimeHour;
-    private int offTimeMin;
+    private int offTimeHour = 12;
+    private int offTimeMin = 0;
+//================================================================================
+// Broadcast recieved logic
+//================================================================================
+    /**
+     * Broadcast receiver which forces all view elements to be updated.
+     */
+    public class SettingsReceiver extends BroadcastReceiver {
+
+        public SettingsReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            /**
+             * Gathers the current securty system information from the background service,
+             * and updates all UI elements with the latest value.
+             */
+            Log.i("ControlFragment","Received message, updating view.");
+            SecuritySystem secState = mService.getSecuritySystemState();
+            updateView(secState);
+        }
+    }
+
+    public void updateView(SecuritySystem secState)
+    {
+        if (secState.light_on_hour != -1 && secState.light_on_min != -1){
+            onTimeView.setText(getTimeString(secState.light_on_hour, secState.light_on_min));
+        }
+        if (secState.light_off_hour != -1 && secState.light_off_min != -1){
+            offTimeView.setText(getTimeString(secState.light_off_hour, secState.light_off_min));
+        }
+    }
+
 //================================================================================
 // Service Binding Logic
 //================================================================================
@@ -95,7 +131,7 @@ public class SettingsFragment extends Fragment {
 
         // OnTime Setup
         onTimeView = binding.lightOnScheduleTime;
-        onTimeView.setText("Extracting from security system...");
+        onTimeView.setText("Unknown");
         onTimeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +141,7 @@ public class SettingsFragment extends Fragment {
 
         // Off time setup
         offTimeView = binding.lightOffScheduleTime;
-        offTimeView.setText("Extracting from security system...");
+        offTimeView.setText("Unknown");
         offTimeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +159,11 @@ public class SettingsFragment extends Fragment {
         // Bind to LocalService
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        // Setup Broadcast receiver
+        IntentFilter filter = new IntentFilter("settings_data");
+        SettingsFragment.SettingsReceiver receiver = new SettingsReceiver();
+        globalContext.registerReceiver(receiver, filter);
     }
 
     @Override
@@ -146,23 +187,28 @@ public class SettingsFragment extends Fragment {
     private TimePickerDialog.OnTimeSetListener onTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minutes) {
+            // Update UI Components
             onTimeHour = hourOfDay;
             onTimeMin = minutes;
             onTimeView.setText(getTimeString(onTimeHour, onTimeMin));
+
+            // Inform Security System of change
+            mService.securitySysState.light_on_min = minutes;
+            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.sendSetStateToSystem();
         }
     };
     private TimePickerDialog.OnTimeSetListener offTimePickerListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minutes) {
-            // TODO Auto-generated method stub
+            // Update UI Components
             offTimeHour = hourOfDay;
             offTimeMin = minutes;
             offTimeView.setText(getTimeString(offTimeHour, offTimeMin));
-//            SharedPreferences.Editor editor = sharedpreferences.edit();
-//            editor.putInt(StartTimeHour, hr);
-//            editor.putInt(StartTimeMin, min);
-//            editor.commit();
-        }
+            // Inform Security System of change
+            mService.securitySysState.light_on_min = minutes;
+            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.sendSetStateToSystem();        }
     };
     private static String utilTime(int value) {
         if (value < 10) return "0" + String.valueOf(value);

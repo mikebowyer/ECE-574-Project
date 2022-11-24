@@ -52,9 +52,9 @@ public class ControlFragment extends Fragment {
     /**
      * Broadcast receiver which forces all view elements to be updated.
      */
-    public class MyReceiver extends BroadcastReceiver {
+    public class ControlReciever extends BroadcastReceiver {
 
-        public MyReceiver() {
+        public ControlReciever() {
         }
 
         @Override
@@ -145,9 +145,9 @@ public class ControlFragment extends Fragment {
         Intent intent = new Intent(globalContext, TCPService.class);
         globalContext.bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        //
-        IntentFilter filter = new IntentFilter("recieved_new_data");
-        MyReceiver receiver = new MyReceiver();
+        // Setup Broadcast reciever
+        IntentFilter filter = new IntentFilter("control_data");
+        ControlReciever receiver = new ControlReciever();
         globalContext.registerReceiver(receiver, filter);
 
 

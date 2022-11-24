@@ -63,11 +63,6 @@ def server_program():
         else:
             pass
             
-                
-
-            
-
-
     conn.close()  # close the connection
     
 

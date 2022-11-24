@@ -18,6 +18,7 @@ public class SecuritySystem {
     public int selected_audio_clip = -1;
     public int alarm_triggered = -1;
     public int alarm_trigger_event = -1;
+
     public SecuritySystem()
     {
 
@@ -67,11 +68,19 @@ public class SecuritySystem {
                 lights =0;
             }
         }
-
-
-
         boolean enable_light_on_time = isBitAtPositionSet(enable_byte, 2);
+        if (enable_light_on_time == true)
+        {
+            light_on_min = getByteFromHexChars(message.charAt(6), message.charAt(7));
+            light_on_hour = getByteFromHexChars(message.charAt(8), message.charAt(9));
+        }
+
         boolean enable_light_off_time = isBitAtPositionSet(enable_byte, 3);
+        if (enable_light_off_time == true)
+        {
+            light_off_min = getByteFromHexChars(message.charAt(10), message.charAt(11));
+            light_off_hour = getByteFromHexChars(message.charAt(12), message.charAt(13));
+        }
         boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
         boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
@@ -97,8 +106,7 @@ public class SecuritySystem {
         control_byte = 0;
         String returnString = getAlarmStateHexString();
         returnString += getLightStateHexString();
-        returnString += "00"; // Lights on time min
-        returnString += "00"; // Lights on time hour
+        returnString += getLightsOnTimeHexString();
         returnString += "00"; // Lights off time min
         returnString += "00"; // Lights off time hour
         returnString += "00"; // Lights Color: Blue
@@ -135,16 +143,31 @@ public class SecuritySystem {
     {
         if(lights == 1)
         {
-            control_byte = control_byte | 0x3;
+            control_byte = control_byte | 0x2;
             return "FF";
         }
         else
         {
             if (lights == 0)
             {
-                control_byte = control_byte | 0x3;
+                control_byte = control_byte | 0x2;
             }
             return "00";
+        }
+    }
+    private String getLightsOnTimeHexString()
+    {
+        if(light_on_min != -1 && light_on_hour != -1)
+        {
+            control_byte = control_byte | 0x4;
+            String min_hex = String.format("%02X", (0xFF & light_on_min));
+            String hour_hex = String.format("%02X", (0xFF & light_on_hour));
+
+            return min_hex + hour_hex;
+        }
+        else
+        {
+            return "0000";
         }
     }
 

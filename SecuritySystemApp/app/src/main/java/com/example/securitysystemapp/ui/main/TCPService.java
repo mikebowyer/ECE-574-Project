@@ -159,10 +159,14 @@ public class TCPService extends Service {
                     securitySysState.setStateWithReceivedPacket(result);
 
                     // send broadcast
-                    Intent intent = new Intent();
-                    intent.setAction("recieved_new_data");
-                    intent.putExtra("MyData", 1000);
-                    sendBroadcast(intent);
+                    Intent control_intent = new Intent();
+                    control_intent.setAction("control_data");
+                    sendBroadcast(control_intent);
+
+                    // send broadcast of settings
+                    Intent settings_intent = new Intent();
+                    settings_intent.setAction("settings_data");
+                    sendBroadcast(settings_intent);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
