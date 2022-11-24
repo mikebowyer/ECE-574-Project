@@ -36,10 +36,10 @@ def main():
     #Testing Configuration
     useUserInterface = True
     useSockets = False
-    useNeoPixels = False
+    useNeoPixels = True
     useMotionSensor = False
     useWindowSensor = True
-    useAlarmAudio = False #Not working
+    useAlarmAudio = True #Not working
     
     #NeoPixel Interface
     neopixelInterface = None
@@ -53,10 +53,15 @@ def main():
     tcpInterface = None
     tcpThread = None
     
+    #Alarm Audio Interface
+    alarmAudioInterface = None
+    alarmAudioThread = None
+    
+    
     if(useNeoPixels):
         neopixelInterface = neopixel_interface.NeopixelInterface()
         neopixelInterface.init()
-        neopixelThread = threading.Thread(target=neopixelInterface.runPixels, args=())
+        neopixelThread = threading.Thread(target=neopixelInterface.runNeoPixelInteface, args=())
         neopixelThread.start()
         
     if(useMotionSensor):
@@ -85,6 +90,8 @@ def main():
         
     if(useAlarmAudio):
         alarmAudioInterface = alarm_audio_interface.AlarmAudioInterface()
+        alarmAudioThread = threading.Thread(target=alarmAudioInterface.runAlarmAudioInteface, args=())
+        alarmAudioThread.start()
 
     ########################################
     #Do magical processing
@@ -99,40 +106,42 @@ def main():
         if(reset):
             alarmTripped = False
             reset = False
+            alarmAudioInterface.resetMode()
         
         if(useMotionSensor):
             #print(str(motionSensorInterface.alarmTripped()))
             alarmTripped = alarmTripped or motionSensorInterface.alarmTripped()
             #alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
-            if(useAlarmAudio):
-                alarmAudioInterface.playAlertSound()
+            if(useAlarmAudio and alarmTripped()):
+                alarmAudioInterface.activateAlertSound()
                 
-            if(useNeoPixels):
+            if(useNeoPixels and alarmTripped()):
                 neopixelInterface.activateWindowAlarmMode()
                 
         if(useWindowSensor):
-            #print("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
+            #p rint("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
             alarmTripped = alarmTripped or windowSensorInterface.alarmTripped()
             alarmReadyForReset = alarmReadyForReset and (not windowSensorInterface.alarmTripped())
-            if(useAlarmAudio):
-                alarmAudioInterface.playAlertSound()
+            
+            if(useAlarmAudio and alarmTripped):
+                alarmAudioInterface.activateAlarmSound()
                 
-            if(useNeoPixels):
+            if(useNeoPixels and alarmTripped):
                 neopixelInterface.activateWindowAlarmMode()
         
         if(alarmTripped):
             if(prevAlarmTripped == False):
-                print("[WARNING] ALARM TRIPPED")      
+                print("[WARNING] ALARM TRIPPED\n")      
         else:
             if(prevAlarmTripped == True):
-                print("[INFO] ALARM RESET")
+                print("[INFO] ALARM RESET\n")
                 if(useNeoPixels):
                     neopixelInterface.resetMode()
                     
         
         if(prevAlarmTripped):
             if(alarmReadyForReset and prevAlarmReadyForReset == False):
-                    print("[INFO] ALARM READY TO RE-ARM")
+                    print("[INFO] ALARM READY TO RE-ARM\n")
             
         prevAlarmTripped = alarmTripped
         prevAlarmReadyForReset = alarmReadyForReset
@@ -161,6 +170,11 @@ def main():
     if(useMotionSensor):
         motionSensorInterface.shutdown()
         motionSensorThread.join()
+        
+    if(useAlarmAudio):
+        alarmAudioInterface.shutdown()
+        alarmAudioThread.join()
+        
         
     print("Exiting")
   

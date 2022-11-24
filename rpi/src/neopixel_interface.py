@@ -26,7 +26,8 @@ class NeopixelInterface:
     def activateWindowAlarmMode(self):
         self.currentLightMode = "WINDOW_ALARM"
         
-    def runPixels(self):
+    #Main Class Thread
+    def runNeoPixelInteface(self):
         while not self.terminate:
             if(self.currentLightMode == "NONE"):
                 self.pixels.fill((0, 0, 0))
@@ -35,6 +36,7 @@ class NeopixelInterface:
             elif(self.currentLightMode == "WINDOW_ALARM"):
                 self.exeWindowAlarm()
             time.sleep(.1) #Sleep to slow down cpu usage when NONE
+        print("NeoPixels Shutdown Complete")
            
     def exeMotionAlarm(self):
         #Set to RED
@@ -73,4 +75,3 @@ class NeopixelInterface:
     def shutdown(self):
         self.terminate = True
         self.pixels.fill((0, 0, 0))
-        print("NeoPixels Shutdown Complete")
