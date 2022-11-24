@@ -7,6 +7,7 @@ import random
 class NeopixelInterface:
     pixels = None
     terminate = False
+    currentLightMode = "NONE"
     def init(self):
         self.pixels = neopixel.NeoPixel(board.D18, 12)
         #self.pixels.fill((127, 127, 127))
@@ -15,15 +16,36 @@ class NeopixelInterface:
         self.pixels.fill((0, 0, 0))
         self.pixels.show()
         print("Initialized NeoPixels")
+        
+    def resetMode(self):
+        self.currentLightMode = "NONE"
+        
+    def activateMotionAlarmMode(self):
+        self.currentLightMode = "MOTION_ALARM"
+        
+    def activateWindowAlarmMode(self):
+        self.currentLightMode = "WINDOW_ALARM"
+        
+    def runPixels(self):
+        while not self.terminate:
+            if(self.currentLightMode == "NONE"):
+                self.pixels.fill((0, 0, 0))
+            elif(self.currentLightMode == "MOTION_ALARM"):
+                self.exeMotionAlarm()
+            elif(self.currentLightMode == "WINDOW_ALARM"):
+                self.exeWindowAlarm()
+            time.sleep(.1) #Sleep to slow down cpu usage when NONE
            
-    def motionAlarm(self):
+    def exeMotionAlarm(self):
+        #Set to RED
         for i in range(0,10):
             self.pixels.fill((255, 0, 0))
             time.sleep(.2)
             self.pixels.fill((0, 0, 0))
             time.sleep(.2)
     
-    def windowAlarm(self):
+    def exeWindowAlarm(self):
+        #Set to BLUE
         for i in range(0,10):
             self.pixels.fill((0, 0, 255))
             time.sleep(.2)

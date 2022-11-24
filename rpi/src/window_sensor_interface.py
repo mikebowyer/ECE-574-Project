@@ -19,7 +19,7 @@ class WindowSensorInterface:
         trippedCounter = 0
         while not self.terminate:
             sensorInput = GPIO.input(self.inputPin)
-            print('Window Sensor: ' + str(sensorInput))
+            #print('Window Sensor: ' + str(sensorInput))
             
             if(sensorInput == 1):
                 trippedCounter += 1
