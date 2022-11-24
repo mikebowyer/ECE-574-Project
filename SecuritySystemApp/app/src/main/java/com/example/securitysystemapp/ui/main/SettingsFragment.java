@@ -1,5 +1,6 @@
 package com.example.securitysystemapp.ui.main;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
@@ -15,6 +16,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -33,7 +37,7 @@ import com.example.securitysystemapp.databinding.SettingsFragmentBinding;
 /**
  * The fragment for the Settings tab in the main activity.
  */
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 //================================================================================
 // class member variables
 //================================================================================
@@ -44,6 +48,10 @@ public class SettingsFragment extends Fragment {
     // UI Elements and context info
     private Context globalContext = null;
     private SettingsFragmentBinding binding;
+
+    // Spinner
+    private Spinner spinner;
+    private volatile boolean update_from_broadcast;
 
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
@@ -56,6 +64,8 @@ public class SettingsFragment extends Fragment {
     private TextView offTimeView;
     private int offTimeHour = 12;
     private int offTimeMin = 0;
+
+
 //================================================================================
 // Broadcast recieved logic
 //================================================================================
@@ -87,6 +97,11 @@ public class SettingsFragment extends Fragment {
         if (secState.light_off_hour != -1 && secState.light_off_min != -1){
             offTimeView.setText(getTimeString(secState.light_off_hour, secState.light_off_min));
         }
+        if (secState.selected_audio_clip != -1){
+            spinner.setSelection(secState.selected_audio_clip);
+            update_from_broadcast = true;
+        }
+
     }
 
 //================================================================================
@@ -121,6 +136,24 @@ public class SettingsFragment extends Fragment {
         return fragment;
     }
 
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        if (mService != null) {
+            if (! update_from_broadcast) {
+                mService.securitySysState.selected_audio_clip = pos;
+                mService.sendSetStateToSystem();
+            }
+            else{
+                update_from_broadcast= false;
+            }
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -148,6 +181,18 @@ public class SettingsFragment extends Fragment {
                 createdDialog(LIGHTS_OFF_TIME_DIALOG_ID).show();
             }
         });
+
+        // Setup Dropdown menu
+        spinner = binding.alarmNoiseDropDown;
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(globalContext,
+                R.array.alarm_sounds_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
         return root;
     }
 
@@ -206,8 +251,8 @@ public class SettingsFragment extends Fragment {
             offTimeMin = minutes;
             offTimeView.setText(getTimeString(offTimeHour, offTimeMin));
             // Inform Security System of change
-            mService.securitySysState.light_on_min = minutes;
-            mService.securitySysState.light_on_hour = hourOfDay;
+            mService.securitySysState.light_off_min = minutes;
+            mService.securitySysState.light_off_hour = hourOfDay;
             mService.sendSetStateToSystem();        }
     };
     private static String utilTime(int value) {

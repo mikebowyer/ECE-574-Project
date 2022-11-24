@@ -24,25 +24,22 @@
         android:id="@+id/light_on_text"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="172dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="170dp"
         android:text="@string/light_on_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/light_off_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
         android:text="@string/light_off_text"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/light_on_text"
         app:layout_constraintStart_toStartOf="@+id/light_on_text"
-        app:layout_constraintTop_toBottomOf="@+id/light_on_text"
-        app:layout_constraintVertical_bias="0.18" />
+        app:layout_constraintTop_toBottomOf="@+id/light_on_text" />
 
     <TextView
         android:id="@+id/light_on_schedule_time"
@@ -63,5 +60,24 @@
         app:layout_constraintEnd_toEndOf="@+id/light_on_schedule_time"
         app:layout_constraintStart_toStartOf="@+id/light_on_schedule_time"
         app:layout_constraintTop_toTopOf="@+id/light_off_text" />
+
+    <Spinner
+        android:id="@+id/alarm_noise_drop_down"
+        android:layout_width="158dp"
+        android:layout_height="28dp"
+        app:layout_constraintBottom_toBottomOf="@+id/alarm_noise_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/alarm_noise_text_view"
+        app:layout_constraintTop_toTopOf="@+id/alarm_noise_text_view" />
+
+    <TextView
+        android:id="@+id/alarm_noise_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:text="Selected Alarm Noise:"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="@+id/light_off_text"
+        app:layout_constraintTop_toBottomOf="@+id/light_off_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
