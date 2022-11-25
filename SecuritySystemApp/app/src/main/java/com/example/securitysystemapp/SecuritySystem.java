@@ -100,15 +100,7 @@ public class SecuritySystem {
             {
                 alarm_triggered = 1;
                 alarm_trigger_event = getByteFromHexChars(message.charAt(24), message.charAt(25));
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(service_context, "ALARM")
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("HI")
-                        .setContentText("mom!")
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(service_context);
-
-// notificationId is a unique int for each notification that you must define
-                notificationManager.notify(1, builder.build());
+                sendAlarmTriggeredNotification();
             }
             else
             {
@@ -227,6 +219,35 @@ public class SecuritySystem {
         {
             return "00";
         }
+    }
+
+    private void sendAlarmTriggeredNotification()
+    {
+
+        // Determine Text to Send
+        CharSequence notification_title = "Alarm Triggered!";
+        CharSequence notification_detail = "Security system alarm has been triggered";
+        if (alarm_trigger_event == 1)
+        {
+            notification_detail += " by a window or door sensor.";
+        }
+        else if (alarm_trigger_event == 2)
+        {
+            notification_detail += " by a motion sensor.";
+        }
+        else
+        {
+            notification_detail += ".";
+        }
+
+        // Assemble and send notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(service_context, "ALARM")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(notification_title)
+                .setContentText(notification_detail)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(service_context);
+        notificationManager.notify(1, builder.build());
     }
 
 }
