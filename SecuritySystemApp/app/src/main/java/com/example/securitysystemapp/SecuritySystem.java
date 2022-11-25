@@ -1,7 +1,11 @@
 package com.example.securitysystemapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class SecuritySystem {
     public int mes_len = 26; // Number of characters in message string
@@ -18,10 +22,11 @@ public class SecuritySystem {
     public int selected_audio_clip = -1;
     public int alarm_triggered = -1;
     public int alarm_trigger_event = -1;
+    public Context service_context;
 
-    public SecuritySystem()
+    public SecuritySystem(Context serviceContext)
     {
-
+        service_context = serviceContext;
     }
 
     public void setStateWithReceivedPacket(String message)
@@ -95,6 +100,15 @@ public class SecuritySystem {
             {
                 alarm_triggered = 1;
                 alarm_trigger_event = getByteFromHexChars(message.charAt(24), message.charAt(25));
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(service_context, "ALARM")
+                        .setSmallIcon(R.drawable.ic_launcher_foreground)
+                        .setContentTitle("HI")
+                        .setContentText("mom!")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(service_context);
+
+// notificationId is a unique int for each notification that you must define
+                notificationManager.notify(1, builder.build());
             }
             else
             {
