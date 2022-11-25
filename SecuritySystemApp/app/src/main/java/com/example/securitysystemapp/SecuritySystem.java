@@ -1,7 +1,11 @@
 package com.example.securitysystemapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class SecuritySystem {
     public int mes_len = 26; // Number of characters in message string
@@ -18,10 +22,11 @@ public class SecuritySystem {
     public int selected_audio_clip = -1;
     public int alarm_triggered = -1;
     public int alarm_trigger_event = -1;
+    public Context service_context;
 
-    public SecuritySystem()
+    public SecuritySystem(Context serviceContext)
     {
-
+        service_context = serviceContext;
     }
 
     public void setStateWithReceivedPacket(String message)
@@ -88,6 +93,20 @@ public class SecuritySystem {
             selected_audio_clip = getByteFromHexChars(message.charAt(20), message.charAt(21));
         }
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
+        if (enable_alarm_triggered == true)
+        {
+            int alarm_triggered_byte = getByteFromHexChars(message.charAt(22), message.charAt(23));
+            if (alarm_triggered_byte == 255)
+            {
+                alarm_triggered = 1;
+                alarm_trigger_event = getByteFromHexChars(message.charAt(24), message.charAt(25));
+                sendAlarmTriggeredNotification();
+            }
+            else
+            {
+                alarm_triggered =0;
+            }
+        }
     }
     public int getByteFromHexChars(Character msb, Character lsb)
     {
@@ -200,6 +219,35 @@ public class SecuritySystem {
         {
             return "00";
         }
+    }
+
+    private void sendAlarmTriggeredNotification()
+    {
+
+        // Determine Text to Send
+        CharSequence notification_title = "Alarm Triggered!";
+        CharSequence notification_detail = "Security system alarm has been triggered";
+        if (alarm_trigger_event == 1)
+        {
+            notification_detail += " by a window or door sensor.";
+        }
+        else if (alarm_trigger_event == 2)
+        {
+            notification_detail += " by a motion sensor.";
+        }
+        else
+        {
+            notification_detail += ".";
+        }
+
+        // Assemble and send notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(service_context, "ALARM")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(notification_title)
+                .setContentText(notification_detail)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(service_context);
+        notificationManager.notify(1, builder.build());
     }
 
 }

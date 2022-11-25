@@ -17,9 +17,10 @@ class SecurityMessage:
         self.reset_everything()
         # self.set_alarm_state(False)
         # self.set_light_state(False)
-        self.set_lights_on_time(13,20)
-        self.set_lights_off_time(2,47)
+        # self.set_lights_on_time(13,20)
+        # self.set_lights_off_time(2,47)
         # self.set_selected_audio_clip(3)
+        self.set_alarm_triggered(False)
 
     def reset_everything(self):
         self.control = 0x00
@@ -82,3 +83,18 @@ class SecurityMessage:
     def set_selected_audio_clip(self, clip_num):
         self.control = self.control | 0x20
         self.selected_audio_clip = clip_num
+
+    def set_alarm_triggered(self, triggered, trigger_event = "unknown"):
+        self.control = self.control | 0x40
+
+        if triggered:
+            self.alarm_triggered = 0xFF
+        else: 
+            self.alarm_triggered = 0x00
+
+        if "window" in trigger_event or "door" in trigger_event:
+            self.alarm_trigger_event = 0x01
+        elif "motion" in trigger_event:
+            self.alarm_trigger_event = 0x02
+        else:
+            self.alarm_trigger_event = 0x00

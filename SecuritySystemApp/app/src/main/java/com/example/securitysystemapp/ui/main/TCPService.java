@@ -44,7 +44,7 @@ public class TCPService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        securitySysState = new SecuritySystem();
+        securitySysState = new SecuritySystem(this);
         Log.i("onStartCommand", "Starting Client Thread");
         this.connectionThread = new Thread(new ConnectionThread());
         this.connectionThread.start();
