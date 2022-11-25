@@ -88,6 +88,19 @@ public class SecuritySystem {
             selected_audio_clip = getByteFromHexChars(message.charAt(20), message.charAt(21));
         }
         boolean enable_alarm_triggered = isBitAtPositionSet(enable_byte, 6);
+        if (enable_alarm_triggered == true)
+        {
+            int alarm_triggered_byte = getByteFromHexChars(message.charAt(22), message.charAt(23));
+            if (alarm_triggered_byte == 255)
+            {
+                alarm_triggered = 1;
+                alarm_trigger_event = getByteFromHexChars(message.charAt(24), message.charAt(25));
+            }
+            else
+            {
+                alarm_triggered =0;
+            }
+        }
     }
     public int getByteFromHexChars(Character msb, Character lsb)
     {

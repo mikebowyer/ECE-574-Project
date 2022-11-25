@@ -61,6 +61,7 @@ def server_program():
             security_sys_state.set_lights_on_time(1,1)
             security_sys_state.set_lights_off_time(2,2)
             # security_sys_state.set_selected_audio_clip(2)
+            security_sys_state.set_alarm_triggered(True, "motion")
         elif "reset" in data:
             security_sys_state.reset_everything()
         else:
