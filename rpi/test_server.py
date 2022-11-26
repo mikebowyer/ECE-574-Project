@@ -32,7 +32,7 @@ def server_program():
     bytestream = bytes(string_to_send, 'utf-8')
     while True:
 
-        data = input('What would you like to do? r=recieve, s=send, c=change, e=exit, reset=reset\n')
+        data = input('What would you like to do? r=recieve, s=send current system state, t=trigger alarm, c=change, e=exit, reset=reset\n')
         if "e" in data:
             exit
         elif "r" in data:
@@ -54,13 +54,13 @@ def server_program():
             string_to_send = security_sys_state.assemble_packet_to_send()
             bytestream = bytes(string_to_send, 'utf-8')
             conn.send(bytestream)
-        elif "c" in data:
-            print("Changing Alaram and light state!:\n")       
-            # security_sys_state.set_alarm_state(True)
-            # security_sys_state.set_light_state(True)
-            security_sys_state.set_lights_on_time(1,1)
-            security_sys_state.set_lights_off_time(2,2)
-            # security_sys_state.set_selected_audio_clip(2)
+        elif "t" in data:
+            if "1" in data:
+                print("Simulating alarm triggered by motion detected event!:\n")       
+                security_sys_state.set_alarm_triggered(True, "motion")
+            if "2" in data:
+                print("Simulating alarm triggered by door/window opened event!:\n")       
+                security_sys_state.set_alarm_triggered(True, "window")
         elif "reset" in data:
             security_sys_state.reset_everything()
         else:
