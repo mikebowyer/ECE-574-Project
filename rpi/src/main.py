@@ -38,6 +38,8 @@ def main():
     global RESET
     prevAlarmOn = False
     prevLightOn = False
+    
+    alarmTypeDict = {"WINDOW1" : False, "DOOR1" : False, "MS1" : False}
         
     #Testing Configuration
     #NOTE 1: NeoPixels needs to run as root
@@ -45,7 +47,7 @@ def main():
     useUserInterface = True
     useSockets = True
     useNeoPixels = True
-    useMotionSensor = True
+    useMotionSensor = False
     useWindowSensor = True
     useAlarmAudio = False
     
@@ -115,9 +117,9 @@ def main():
         alarmAudioThread = threading.Thread(target=alarmAudioInterface.runAlarmAudioInteface, args=())
         alarmAudioThread.start()
 
-    ########################################
-    #Do magical processing
-    ########################################
+########################################
+#Do magical processing
+########################################
     alarmTripped = False
     prevAlarmTripped = False
     
@@ -127,53 +129,75 @@ def main():
         if(useSockets):
             DATA_REPO = tcpInterface.get_current_system_state()
         
-        #Process lights first
-        if(useNeoPixels and DATA_REPO.get_light_state()):
-            if(prevLightOn == False):
-                print("[INFO] Lights Turned On")
+###############
+#Process Lights
+###############
+        if(useNeoPixels):
+            
+            if(alarmTypeDict["MS1"] == True):
+                neopixelInterface.activateMotionAlarmMode()
+            elif(alarmTypeDict["WINDOW1"] == True):
+                neopixelInterface.activateWindowAlarmMode()
+              
+            if((DATA_REPO.get_light_state() == True) and (alarmTripped == False)):
+                if(prevLightOn == False):
+                    print("[INFO] Lights Turned On")
+                if(DATA_REPO.get_alarm_triggered() == False):
+                    neopixelInterface.setCustomNeopixelColors(255, 255, 255)
+                    neopixelInterface.activateCustomLightMode()
+            elif(alarmTripped == False):
+                if(prevLightOn == True):
+                    print("INFO] Lights Turned Off")
+                    neopixelInterface.resetMode()
+            prevLightOn = DATA_REPO.get_light_state()
+            
+###############
+#Process Audio
+###############            
+        if(useAlarmAudio):
+            if(windowSensorInterface.alarmTripped()):
+                alarmAudioInterface.activateAlarmSound()
                 
-            if(DATA_REPO.get_alarm_triggered() == False):
-                neopixelInterface.setCustomNeopixelColors(255, 255, 255)
-                neopixelInterface.activateCustomLightMode()
-        else:
-            if(prevLightOn == True):
-                print("INFO] Lights Turned Off")
-            neopixelInterface.resetMode()
-        prevLightOn = DATA_REPO.get_light_state()
-        
-        #####
-        ## PROCESS MAIN ALARM LOGIC
-        #####
+            if(motionSensorInterface.alarmTripped()):
+                alarmAudioInterface.activateAlertSound()
+
+########################################
+## PROCESS MAIN ALARM LOGIC
+########################################
+        #print(alarmTripped)
         if(DATA_REPO.get_alarm_state()):
             if(prevAlarmOn == False):
                 print("[INFO] Alarm Turned On")
             alarmReadyForReset = True #reset ready unless proven otherwise  
             if(RESET):
+                print("[INFO] RESETING ALARM")
                 alarmTripped = False
                 RESET = False
+                alarmTypeDict["WINDOW1"] = False
+                alarmTypeDict["MS1"] = False
+                
+                if(useNeoPixels):
+                    print("RESET NEOs")
+                    neopixelInterface.resetMode()
+                
                 if(useAlarmAudio):
                     alarmAudioInterface.resetMode()
             
             if(useMotionSensor):
                 #print(str(motionSensorInterface.alarmTripped()))
+                if((DATA_REPO.get_alarm_state() == True) and motionSensorInterface.alarmTripped()):
+                    alarmTypeDict["MS1"] = True
+                
                 alarmTripped = alarmTripped or motionSensorInterface.alarmTripped()
-                alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
-                if(useAlarmAudio and motionSensorInterface.alarmTripped()):
-                    alarmAudioInterface.activateAlertSound()
-                    
-                if(useNeoPixels and motionSensorInterface.alarmTripped()):
-                    neopixelInterface.activateMotionAlarmMode()
-                    
+                alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())            
+         
             if(useWindowSensor):
                 #print("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
+                if((DATA_REPO.get_alarm_state() == True) and windowSensorInterface.alarmTripped()):
+                    alarmTypeDict["WINDOW1"] = True
+                
                 alarmTripped = alarmTripped or windowSensorInterface.alarmTripped()
                 alarmReadyForReset = alarmReadyForReset and (not windowSensorInterface.alarmTripped())
-                
-                if(useAlarmAudio and windowSensorInterface.alarmTripped()):
-                    alarmAudioInterface.activateAlarmSound()
-                    
-                if(useNeoPixels and windowSensorInterface.alarmTripped()):
-                    neopixelInterface.activateWindowAlarmMode()
             
             if(alarmTripped):
                 if(prevAlarmTripped == False):
@@ -200,8 +224,12 @@ def main():
         
         #Set All current Values as previous 
         prevAlarmOn = DATA_REPO.get_alarm_state()
+        prevLightOn = DATA_REPO.get_light_state()
         time.sleep(.1) #check at 10 Hz to lower CPU usage
-                  
+
+########################################
+##CLEANUP
+########################################
     print("Exiting Main Loop")
     
     #Quit first based on console input
@@ -229,8 +257,8 @@ def main():
         alarmAudioInterface.shutdown()
         alarmAudioThread.join()
         
-        
-    print("Exiting")
+    print("Exiting Program")
   
 if __name__=="__main__":
     main()
+

@@ -40,6 +40,7 @@ class NeopixelInterface:
     #Main Class Thread
     def runNeoPixelInteface(self):
         while not self.terminate:
+            #print(self.currentLightMode)
             if(self.currentLightMode == "NONE"):
                 self.pixels.fill((0, 0, 0))
             elif(self.currentLightMode == "MOTION_ALARM"):
