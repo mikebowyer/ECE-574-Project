@@ -143,14 +143,10 @@ def main():
                 if(prevLightOn == False):
                     print("[INFO] Lights Turned On")
                 if(DATA_REPO.get_alarm_triggered() == False):
-                    #100 works
-                    neopixelInterface.setCustomNeopixelColors(100, 100, 100)
-                    
-                    #draws too much power
-                    #neopixelInterface.setCustomNeopixelColors(128, 128, 128)
-                    
-                    #draws too much power
-                    #neopixelInterface.setCustomNeopixelColors(255, 255, 255)
+                    red = DATA_REPO.get_lights_color_red()
+                    green = DATA_REPO.get_lights_color_green()
+                    blue = DATA_REPO.get_lights_color_blue()                  
+                    neopixelInterface.setCustomNeopixelColors(red, green, blue)
                     neopixelInterface.activateCustomLightMode()
             elif(alarmTripped == False):
                 if(prevLightOn == True):
