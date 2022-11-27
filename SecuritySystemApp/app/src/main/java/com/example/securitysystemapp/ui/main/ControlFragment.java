@@ -93,6 +93,11 @@ public class ControlFragment extends Fragment {
             default:
                 break;
         }
+        if (secState.lights_color_red != -1 && secState.lights_color_green != -1 && secState.lights_color_blue != -1)
+        {
+            int color = (0xff) << 24 | (secState.lights_color_red & 0xff) << 16 | (secState.lights_color_green & 0xff) << 8 | (secState.lights_color_blue & 0xff);
+            mColorPreview.setBackgroundColor(color);
+        }
     }
 
 //================================================================================
