@@ -12,7 +12,7 @@ class NeopixelInterface:
     customGreen = 0
     customRed = 0
     def init(self):
-        self.pixels = neopixel.NeoPixel(board.D18, 12)
+        self.pixels = neopixel.NeoPixel(board.D21, 12)
         #self.pixels.fill((127, 127, 127))
         #self.pixels.show()
         #time.sleep(.5)

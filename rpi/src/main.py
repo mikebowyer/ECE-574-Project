@@ -49,7 +49,7 @@ def main():
     useNeoPixels = True
     useMotionSensor = True
     useWindowSensor = True
-    useAlarmAudio = False
+    useAlarmAudio = True
     
     print("Initial Conditions:")
     print("Alarm On: " + str(DATA_REPO.get_alarm_state()))
@@ -162,10 +162,10 @@ def main():
 #Process Audio
 ###############            
         if(useAlarmAudio):
-            if(windowSensorInterface.alarmTripped()):
+            if(alarmTypeDict["WINDOW1"] == True):
                 alarmAudioInterface.activateAlarmSound()
                 
-            if(motionSensorInterface.alarmTripped()):
+            elif(alarmTypeDict["MS1"] == True):
                 alarmAudioInterface.activateAlertSound()
 
 ########################################

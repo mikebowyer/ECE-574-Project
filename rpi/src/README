@@ -4,9 +4,6 @@
 -Install Neopixel dependencies
 pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 
--Install Bluetooth dependencies (Not needed)
-apt-get install bluetooth bluez libbluetooth-dev
-python3 -m pip install pybluez
 
 -Install Audio playback in python (playsound didn't work)
 python3 -m pip install pydub
@@ -19,7 +16,7 @@ sudo apt-get install rpi.gpio
 -NeoPixel connections:
     -5V to either 5V on Pi
     -Ground to any ground
-    -Data in to GPIO 18
+    -Data in to GPIO 21
     
 -Enable 3.5mm Audio jack
 sudo raspi-config

@@ -1,4 +1,5 @@
 import time
+import os
 from pydub import AudioSegment
 from pydub.playback import play
 
@@ -18,12 +19,12 @@ class AlarmAudioInterface:
     #Main Class Thread
     def runAlarmAudioInteface(self):
         while not self.terminate:
+            if(self.currentAudioMode == "NONE"):
+                pass
             if(self.currentAudioMode == "ALERT"):
                 self.playAlertSound()
             elif(self.currentAudioMode == "ALARM"):
                 self.playAlarmSound()
-            else:
-                pass
             time.sleep(.1) #Sleep to slow down cpu usage when NONE
             
     def activateAlertSound(self):
