@@ -155,10 +155,7 @@ public class ControlFragment extends Fragment {
         ControlReciever receiver = new ControlReciever();
         globalContext.registerReceiver(receiver, filter);
 
-
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -231,7 +228,7 @@ public class ControlFragment extends Fragment {
                             mService.securitySysState.lights_color_red = Color.red(color);
                             mService.securitySysState.lights_color_green = Color.green(color);
                             mService.securitySysState.lights_color_blue = Color.blue(color);
-//                            mService.sendSetStateToSystem();
+                            mService.sendSetStateToSystem();
 
                             mColorPreview.setBackgroundColor(color);
                         }

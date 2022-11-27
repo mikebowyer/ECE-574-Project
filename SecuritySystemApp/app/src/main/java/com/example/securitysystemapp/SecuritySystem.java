@@ -141,10 +141,8 @@ public class SecuritySystem {
         returnString += getLightStateHexString();
         returnString += getLightsOnTimeHexString();
         returnString += getLightsOffTimeHexString();
-        returnString += "00"; // Lights Color: Blue
-        returnString += "00"; // Lights Color: green
-        returnString += "00"; // Lights Color: red
-        returnString += getSelectedAudioClipHexString(); // Alarm audio clip
+        returnString += getLightsColorHexString();
+        returnString += getSelectedAudioClipHexString();
         returnString += "00"; // Alarm triggered
         returnString += "00"; // Alarm event
         return getControlHexSendString() + returnString;
@@ -215,6 +213,22 @@ public class SecuritySystem {
             else
             {
                 return "0000";
+        }
+    }
+
+    private String getLightsColorHexString()
+    {
+        if(lights_color_red != -1 && lights_color_green != -1 && lights_color_blue != -1)
+        {
+            control_byte = control_byte | 0x10;
+            String blue_hex = String.format("%02X", (0xFF & lights_color_blue));
+            String green_hex = String.format("%02X", (0xFF & lights_color_green));
+            String red_hex = String.format("%02X", (0xFF & lights_color_red));
+            return blue_hex + green_hex + red_hex;
+        }
+        else
+        {
+            return "000000";
         }
     }
 
