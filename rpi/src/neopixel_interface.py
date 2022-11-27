@@ -8,9 +8,9 @@ class NeopixelInterface:
     pixels = None
     terminate = False
     currentLightMode = "NONE"
-    customBlue = 255
-    customGreen = 255
-    customRed = 255
+    customBlue = 0
+    customGreen = 0
+    customRed = 0
     def init(self):
         self.pixels = neopixel.NeoPixel(board.D18, 12)
         #self.pixels.fill((127, 127, 127))

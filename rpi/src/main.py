@@ -47,7 +47,7 @@ def main():
     useUserInterface = True
     useSockets = True
     useNeoPixels = True
-    useMotionSensor = False
+    useMotionSensor = True
     useWindowSensor = True
     useAlarmAudio = False
     
@@ -143,7 +143,14 @@ def main():
                 if(prevLightOn == False):
                     print("[INFO] Lights Turned On")
                 if(DATA_REPO.get_alarm_triggered() == False):
-                    neopixelInterface.setCustomNeopixelColors(255, 255, 255)
+                    #100 works
+                    neopixelInterface.setCustomNeopixelColors(100, 100, 100)
+                    
+                    #draws too much power
+                    #neopixelInterface.setCustomNeopixelColors(128, 128, 128)
+                    
+                    #draws too much power
+                    #neopixelInterface.setCustomNeopixelColors(255, 255, 255)
                     neopixelInterface.activateCustomLightMode()
             elif(alarmTripped == False):
                 if(prevLightOn == True):
@@ -220,6 +227,13 @@ def main():
                 print("[INFO] Alarm Turned Off")
         #Write Updates to App
         if(useSockets):
+            #DATA_REPO.set_alarm_state(False)
+            triggerEvent = "unknown"
+            if(alarmTypeDict["WINDOW1"] == True):
+                triggerEvent = "window"
+            elif(alarmTypeDict["MS1"] == True):
+                triggerEvent = "motion"           
+            DATA_REPO.set_alarm_triggered(alarmTripped, triggerEvent)
             tcpInterface.set_current_system_state(DATA_REPO)
         
         #Set All current Values as previous 

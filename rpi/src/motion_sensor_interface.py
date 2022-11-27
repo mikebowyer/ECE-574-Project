@@ -5,38 +5,43 @@ class MotionSensorInterface:
     inputPin = 23
     terminate = False
     alarmTripStatus = False
+    
+    trippedCounter = 0
+    initializedCount = 0
+    initialized = False
         
     def init(self):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.inputPin, GPIO.IN, pull_up_down=GPIO.PUD_UP) #set pin as input
         print("Initialized Motion Sensor")
-    
-    def test(self):
-        testInput = GPIO.input(self.inputPin) #0 = window closed, 1 = window open
-        print(testInput)
+        
+    def resetMode(self):
+        self.trippedCounter = 0
+        self.initializedCount = 0
+        self.initialized = False
         
     def runSensorInterface(self):
-        trippedCounter = 0
-        initializedCount = 0
-        initialized = False
+        self.trippedCounter = 0
+        self.initializedCount = 0
+        self.initialized = False
         while not self.terminate:
             sensorInput = GPIO.input(self.inputPin)
             #print('Motion Sensor: ' + str(sensorInput))
             
-            if(not initialized):
+            if(not self.initialized):
                 if(sensorInput == 1):
-                    initializedCount += 1
-                if(initializedCount > 20):
-                    initialized = True
+                    self.initializedCount += 1
+                if(self.initializedCount > 20):
+                    self.initialized = True
                     print("Motion Sensor Initialized")
             
             elif(sensorInput == 0):
-                trippedCounter += 1
+                self.trippedCounter += 1
             else:
-                trippedCounter = 0
+                self.trippedCounter = 0
                 
             #print("MS TRIP COUNT: " + str(trippedCounter))
-            if(trippedCounter > 3):
+            if(self.trippedCounter > 3):
                 print("MS TRIPPED")
                 self.alarmTripStatus = True
             elif(self.alarmTripStatus == True):
