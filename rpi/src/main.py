@@ -6,9 +6,9 @@ import neopixel_interface
 import motion_sensor_interface
 import window_sensor_interface
 import alarm_audio_interface
-import data_repository
+import security_message
 
-DATA_REPO = data_repository.DataRepository()
+DATA_REPO = security_message.SecurityMessage()
 
 SERVER_ADDR = "192.168.1.8"
 SERVER_PORT = 5000
@@ -36,6 +36,7 @@ q) quit
 def main():
     global DATA_REPO
     global RESET
+    prevAlarmOn = False
     
     #Testing Configuration
     #NOTE 1: NeoPixels needs to run as root
@@ -91,6 +92,7 @@ def main():
         global RX_PORT        
         tcpInterface = tcp_interface.TCPInterface()
         tcpInterface.init(SERVER_ADDR, SERVER_PORT)
+        tcpInterface.set_current_system_state(DATA_REPO) #send app all current values
         tcpThread = threading.Thread(target=tcpInterface.server_program, args=())
         tcpThread.start()
         
@@ -107,56 +109,65 @@ def main():
     
     prevAlarmReadyForReset = True
     while not TERMINATE:
+        #Receive Commands from App
         if(useSockets):
-            systemStatePacket = tcpInterface.get_current_system_state()
-            print(systemStatePacket.alarm_state)
-        
-        
-        alarmReadyForReset = True #reset ready unless proven otherwise
-        
-        if(RESET):
-            alarmTripped = False
-            RESET = False
-            alarmAudioInterface.resetMode()
-        
-        if(useMotionSensor):
-            #print(str(motionSensorInterface.alarmTripped()))
-            alarmTripped = alarmTripped or motionSensorInterface.alarmTripped()
-            alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
-            if(useAlarmAudio and alarmTripped):
-                alarmAudioInterface.activateAlertSound()
-                
-            if(useNeoPixels and alarmTripped()):
-                neopixelInterface.activateWindowAlarmMode()
-                
-        if(useWindowSensor):
-            #print("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
-            alarmTripped = alarmTripped or windowSensorInterface.alarmTripped()
-            alarmReadyForReset = alarmReadyForReset and (not windowSensorInterface.alarmTripped())
+            DATA_REPO = tcpInterface.get_current_system_state()
             
-            if(useAlarmAudio and alarmTripped):
-                alarmAudioInterface.activateAlarmSound()
-                
-            if(useNeoPixels and alarmTripped):
-                neopixelInterface.activateWindowAlarmMode()
-        
-        if(alarmTripped):
-            if(prevAlarmTripped == False):
-                print("[WARNING] ALARM TRIPPED\n")      
-        else:
-            if(prevAlarmTripped == True):
-                print("[INFO] ALARM RESET\n")
-                if(useNeoPixels):
-                    neopixelInterface.resetMode()
+        if(DATA_REPO.get_alarm_state()):
+            if(prevAlarmOn == False):
+                print("[INFO] Alarm Turned On")
+            alarmReadyForReset = True #reset ready unless proven otherwise  
+            if(RESET):
+                alarmTripped = False
+                RESET = False
+                alarmAudioInterface.resetMode()
+            
+            if(useMotionSensor):
+                #print(str(motionSensorInterface.alarmTripped()))
+                alarmTripped = alarmTripped or motionSensorInterface.alarmTripped()
+                alarmReadyForReset = alarmReadyForReset and (not motionSensorInterface.alarmTripped())
+                if(useAlarmAudio and alarmTripped):
+                    alarmAudioInterface.activateAlertSound()
                     
-        
-        if(prevAlarmTripped):
-            if(alarmReadyForReset and prevAlarmReadyForReset == False):
-                    print("[INFO] ALARM READY TO RE-ARM\n")
+                if(useNeoPixels and alarmTripped()):
+                    neopixelInterface.activateWindowAlarmMode()
+                    
+            if(useWindowSensor):
+                #print("SENSOR VALUE: " + str(windowSensorInterface.alarmTripped()))
+                alarmTripped = alarmTripped or windowSensorInterface.alarmTripped()
+                alarmReadyForReset = alarmReadyForReset and (not windowSensorInterface.alarmTripped())
+                
+                if(useAlarmAudio and alarmTripped):
+                    alarmAudioInterface.activateAlarmSound()
+                    
+                if(useNeoPixels and alarmTripped):
+                    neopixelInterface.activateWindowAlarmMode()
             
-        prevAlarmTripped = alarmTripped
-        prevAlarmReadyForReset = alarmReadyForReset
+            if(alarmTripped):
+                if(prevAlarmTripped == False):
+                    print("[WARNING] ALARM TRIPPED\n")      
+            else:
+                if(prevAlarmTripped == True):
+                    print("[INFO] ALARM RESET\n")
+                    if(useNeoPixels):
+                        neopixelInterface.resetMode()
+                        
+            if(prevAlarmTripped):
+                if(alarmReadyForReset and prevAlarmReadyForReset == False):
+                        print("[INFO] ALARM READY TO RE-ARM\n")
+                
+            prevAlarmTripped = alarmTripped
+            prevAlarmReadyForReset = alarmReadyForReset
         
+        else: #if alarm not turned on
+            if(prevAlarmOn == True):
+                print("[INFO] Alarm Turned Off")
+        #Write Updates to App
+        if(useSockets):
+            tcpInterface.set_current_system_state(DATA_REPO)
+        
+        #Set All current Values as previous 
+        prevAlarmOn = DATA_REPO.get_alarm_state()
         time.sleep(.1) #check at 10 Hz to lower CPU usage
                   
     print("Exiting Main Loop")

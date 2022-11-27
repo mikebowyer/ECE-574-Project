@@ -89,3 +89,6 @@ class TCPInterface:
         
     def get_current_system_state(self):
         return copy.copy(self.security_sys_state)
+    
+    def set_current_system_state(self, updated_sys_state):
+        self.security_sys_state = updated_sys_state

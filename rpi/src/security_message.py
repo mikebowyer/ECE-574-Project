@@ -111,7 +111,7 @@ class SecurityMessage:
             self.alarm_trigger_event = 0x00
             
     ###########################################
-    #RECEIVE FUNCTIONS
+    #RECEIVE TCP STREAM FUNCTIONS
     ############################################
     def update_alarm_state(self, rx_string):
         self.alarm_state = int(rx_string[2:4], 16)
@@ -149,3 +149,42 @@ class SecurityMessage:
         self.update_lights_color_green(rx_string)
         self.update_lights_color_red(rx_string)
         self.update_selected_audio_clip(rx_string)
+    
+    ###########################################
+    #GETTER FUNCTIONS
+    ############################################ 
+    def get_alarm_state(self):
+        if(self.alarm_state == 0xFF):
+            return True
+        else:
+            return False
+
+    def get_light_state(self):
+        if(self.light_state == 0xFF):
+            return True
+        else:
+            return False
+
+    def get_lights_on_time_hour_min_tuple(self):
+        return (self.light_on_hour, self.light_on_min)
+    
+    def set_lights_off_time_hour_min_tuple(self):
+        return (self.light_off_hour, self.light_off_min)
+        
+    def get_lights_color_blue(self):
+        return self.lights_color_blue
+        
+    def get_lights_color_green(self):
+        return self.lights_color_green
+        
+    def get_lights_color_red(self):
+        return self.lights_color_red
+
+    def get_selected_audio_clip(self):
+        return self.selected_audio_clip
+
+    def get_alarm_triggered(self):
+        if(self.alarm_triggered == 0xFF):
+            return True
+        else:
+            return False
