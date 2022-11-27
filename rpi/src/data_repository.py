@@ -11,6 +11,7 @@ class DataRepository:
     alarmTriggeredType = 0 #Door, Window, Motion, etc
     
     def __init__(self):
+        pass
         #self.control = 0x00
         #self.alarm_state = 0x00
         #self.light_state = 0x00

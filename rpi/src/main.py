@@ -107,6 +107,11 @@ def main():
     
     prevAlarmReadyForReset = True
     while not TERMINATE:
+        if(useSockets):
+            systemStatePacket = tcpInterface.get_current_system_state()
+            print(systemStatePacket.alarm_state)
+        
+        
         alarmReadyForReset = True #reset ready unless proven otherwise
         
         if(RESET):

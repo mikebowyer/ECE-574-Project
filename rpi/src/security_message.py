@@ -30,14 +30,16 @@ class SecurityMessage:
         self.light_on_min = 0x00
         self.light_off_hour = 0x00
         self.light_off_min = 0x00
-        self.lights_color_red = 0x00
-        self.lights_color_green = 0x00
         self.lights_color_blue = 0x00
+        self.lights_color_green = 0x00
+        self.lights_color_red = 0x00
         self.selected_audio_clip = 0x00
         self.alarm_triggered = 0x00
         self.alarm_trigger_event = 0x00
 
     def assemble_packet_to_send(self):
+        #print("TX ALARM STATE: " + f'{self.alarm_state:02x}')
+        
         string_to_send = ""
         string_to_send+=f'{self.control:02x}' # Left Most
         string_to_send+=f'{self.alarm_state:02x}'
@@ -57,35 +59,44 @@ class SecurityMessage:
         return string_to_send
 
     def set_alarm_state(self, state):
-        self.control = self.control | 0x01
+        #self.control = self.control | 0x01
         if state:
             self.alarm_state = 0xFF
         else:
             self.alarm_state = 0x00
 
     def set_light_state(self, state):
-        self.control = self.control | 0x02
+        #self.control = self.control | 0x02
         if state:
             self.light_state = 0xFF
         else:
             self.light_state = 0x00
 
     def set_lights_on_time(self, hour, min):
-        self.control = self.control | 0x04
+        #self.control = self.control | 0x04
         self.light_on_hour = hour
         self.light_on_min = min
     
     def set_lights_off_time(self, hour, min):
-        self.control = self.control | 0x08
+        #self.control = self.control | 0x08
         self.light_off_hour = hour
         self.light_off_min = min
+        
+    def set_lights_color_blue(self, colorVal):
+        self.lights_color_blue = hex(colorVal)
+        
+    def set_lights_color_green(self, colorVal):
+        self.lights_color_green = hex(colorVal)
+        
+    def set_lights_color_red(self, colorVal):
+        self.lights_color_red = hex(colorVal)
 
     def set_selected_audio_clip(self, clip_num):
-        self.control = self.control | 0x20
+        #self.control = self.control | 0x20
         self.selected_audio_clip = clip_num
 
     def set_alarm_triggered(self, triggered, trigger_event = "unknown"):
-        self.control = self.control | 0x40
+        #self.control = self.control | 0x40
 
         if triggered:
             self.alarm_triggered = 0xFF
@@ -98,3 +109,43 @@ class SecurityMessage:
             self.alarm_trigger_event = 0x02
         else:
             self.alarm_trigger_event = 0x00
+            
+    ###########################################
+    #RECEIVE FUNCTIONS
+    ############################################
+    def update_alarm_state(self, rx_string):
+        self.alarm_state = int(rx_string[2:4], 16)
+            
+    def update_light_state(self, rx_string):
+        self.light_state = int(rx_string[4:6], 16)
+            
+    def update_lights_on_time(self, rx_string):
+        self.light_on_min = int(rx_string[6:8], 16)
+        self.light_on_hour = int(rx_string[8:10], 16)
+    
+    def update_lights_off_time(self, rx_string):
+        self.light_off_min = int(rx_string[10:12], 16)
+        self.light_off_hour = int(rx_string[12:14], 16)
+        
+    def update_lights_color_blue(self, rx_string):
+        self.lights_color_blue = int(rx_string[14:16], 16)
+        
+    def update_lights_color_green(self, rx_string):
+        self.lights_color_green = int(rx_string[16:18], 16)
+        
+    def update_lights_color_red(self, rx_string):
+        self.lights_color_red = int(rx_string[18:20], 16)      
+
+    def update_selected_audio_clip(self, rx_string):
+        self.selected_audio_clip = int(rx_string[20:22], 16)
+            
+    def disassemble_packet(self, rx_string):
+        #print("RX_STRING: " + rx_string)
+        self.update_alarm_state(rx_string)
+        self.update_light_state(rx_string)
+        self.update_lights_on_time(rx_string)
+        self.update_lights_off_time(rx_string)
+        self.update_lights_color_blue(rx_string)
+        self.update_lights_color_green(rx_string)
+        self.update_lights_color_red(rx_string)
+        self.update_selected_audio_clip(rx_string)

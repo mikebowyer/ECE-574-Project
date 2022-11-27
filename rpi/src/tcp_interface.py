@@ -1,6 +1,7 @@
 import socket
 import sys, select
 import security_message
+import copy
 
 class TCPInterface:
     # get the hostname
@@ -27,6 +28,12 @@ class TCPInterface:
 
         # Create initial state of security system
         self.security_sys_state = security_message.SecurityMessage()
+        self.security_sys_state.set_alarm_state(False)
+        self.security_sys_state.set_light_state(False)
+        self.security_sys_state.set_lights_on_time(0, 0)
+        self.security_sys_state.set_lights_off_time(0, 0)
+        self.security_sys_state.set_selected_audio_clip(0)
+        self.security_sys_state.set_alarm_triggered(False)
         
     def server_program(self):
         
@@ -50,34 +57,35 @@ class TCPInterface:
             #     break
             # print("from connected user: " + str(data))
             
-            # Recieve 
+            # Recieve
+            received_str = ""
             try:
-                recieved_str = ""
                 next_byte = ""
                 next_byte_decoded = ""
                 while next_byte_decoded != "\n":
                     next_byte = self.conn.recv(1)
                     next_byte_decoded = next_byte.decode()
-                    recieved_str += next_byte_decoded
-                    # print(next_byte_decoded)
+                    received_str += next_byte_decoded
+                    #print(next_byte_decoded)
             except: 
                 pass
-            print(recieved_str)
+            if(len(received_str) > 0):
+                self.security_sys_state.disassemble_packet(received_str)
             
-            mypacket= security_message.SecurityMessage()
-            mypacket.set_alarm_state(True)
-            string_to_send = mypacket.assemble_packet_to_send()
+            #mypacket = security_message.SecurityMessage()
+            #mypacket.set_alarm_state(True)
+            #string_to_send = mypacket.assemble_packet_to_send()
+            string_to_send = self.security_sys_state.assemble_packet_to_send()
             bytestream = bytes(string_to_send, 'utf-8')
+            #print("TX_STRING: " + string_to_send)
             self.conn.send(bytestream)
             
-            # conn.send(data.encode())  # send data to the client
-            # PACKET_SIZE = 1024
-            # line = "random len of line here"
-            # conn.send(b"00\n")
-            # data = input(' -> ')
             
         self.conn.close()  # close the connection
         print("TCP Shutdown Complete")
         
     def shutdown(self):
         self.terminate = True
+        
+    def get_current_system_state(self):
+        return copy.copy(self.security_sys_state)
