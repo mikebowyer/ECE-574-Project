@@ -1,7 +1,6 @@
 package com.example.securitysystemapp;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -86,7 +85,18 @@ public class SecuritySystem {
             light_off_min = getByteFromHexChars(message.charAt(10), message.charAt(11));
             light_off_hour = getByteFromHexChars(message.charAt(12), message.charAt(13));
         }
+        if (enable_light_off_time == true)
+        {
+            light_off_min = getByteFromHexChars(message.charAt(10), message.charAt(11));
+            light_off_hour = getByteFromHexChars(message.charAt(12), message.charAt(13));
+        }
         boolean enable_light_colors = isBitAtPositionSet(enable_byte, 4);
+        if (enable_light_colors == true)
+        {
+            lights_color_blue = getByteFromHexChars(message.charAt(14), message.charAt(15));
+            lights_color_green = getByteFromHexChars(message.charAt(16), message.charAt(17));
+            lights_color_red = getByteFromHexChars(message.charAt(18), message.charAt(19));
+        }
         boolean enable_alarm_audio_clip = isBitAtPositionSet(enable_byte, 5);
         if (enable_alarm_audio_clip == true)
         {
@@ -131,10 +141,8 @@ public class SecuritySystem {
         returnString += getLightStateHexString();
         returnString += getLightsOnTimeHexString();
         returnString += getLightsOffTimeHexString();
-        returnString += "00"; // Lights Color: Blue
-        returnString += "00"; // Lights Color: green
-        returnString += "00"; // Lights Color: red
-        returnString += getSelectedAudioClipHexString(); // Alarm audio clip
+        returnString += getLightsColorHexString();
+        returnString += getSelectedAudioClipHexString();
         returnString += "00"; // Alarm triggered
         returnString += "00"; // Alarm event
         return getControlHexSendString() + returnString;
@@ -205,6 +213,22 @@ public class SecuritySystem {
             else
             {
                 return "0000";
+        }
+    }
+
+    private String getLightsColorHexString()
+    {
+        if(lights_color_red != -1 && lights_color_green != -1 && lights_color_blue != -1)
+        {
+            control_byte = control_byte | 0x10;
+            String blue_hex = String.format("%02X", (0xFF & lights_color_blue));
+            String green_hex = String.format("%02X", (0xFF & lights_color_green));
+            String red_hex = String.format("%02X", (0xFF & lights_color_red));
+            return blue_hex + green_hex + red_hex;
+        }
+        else
+        {
+            return "000000";
         }
     }
 

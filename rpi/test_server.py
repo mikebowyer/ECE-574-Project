@@ -56,11 +56,13 @@ def server_program():
             conn.send(bytestream)
         elif "t" in data:
             if "1" in data:
-                print("Simulating alarm triggered by motion detected event!:\n")       
-                security_sys_state.set_alarm_triggered(True, "motion")
+                # print("Simulating alarm triggered by motion detected event!:\n")       
+                # security_sys_state.set_alarm_triggered(True, "motion")
+                security_sys_state.set_lights_color(0,255,0)
             if "2" in data:
-                print("Simulating alarm triggered by door/window opened event!:\n")       
-                security_sys_state.set_alarm_triggered(True, "window")
+                # print("Simulating alarm triggered by door/window opened event!:\n")       
+                # security_sys_state.set_alarm_triggered(True, "window")
+                security_sys_state.set_lights_color(0,0,255)
         elif "reset" in data:
             security_sys_state.reset_everything()
         else:
