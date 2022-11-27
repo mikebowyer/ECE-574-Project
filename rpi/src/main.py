@@ -37,6 +37,17 @@ def main():
     global DATA_REPO 
     global RESET
     prevAlarmOn = False
+    prevLightOn = False
+        
+    #Testing Configuration
+    #NOTE 1: NeoPixels needs to run as root
+    #NOTE 2: AlarmAudio (Pydub) causes issues when run as root (currently...need to fix this)
+    useUserInterface = True
+    useSockets = True
+    useNeoPixels = True
+    useMotionSensor = False
+    useWindowSensor = True
+    useAlarmAudio = False
     
     print("Initial Conditions:")
     print("Alarm On: " + str(DATA_REPO.get_alarm_state()))
@@ -49,16 +60,7 @@ def main():
     print("Green Color: " + str(DATA_REPO.get_lights_color_green()))
     print("Red Color: " + str(DATA_REPO.get_lights_color_red()))
     print("Audio Clip Num: " + str(DATA_REPO.get_selected_audio_clip()))
-    
-    #Testing Configuration
-    #NOTE 1: NeoPixels needs to run as root
-    #NOTE 2: AlarmAudio (Pydub) causes issues when run as root (currently...need to fix this)
-    useUserInterface = True
-    useSockets = True
-    useNeoPixels = False
-    useMotionSensor = False
-    useWindowSensor = False
-    useAlarmAudio = True
+
     
     #NeoPixel Interface
     neopixelInterface = None
@@ -124,7 +126,24 @@ def main():
         #Receive Commands from App
         if(useSockets):
             DATA_REPO = tcpInterface.get_current_system_state()
-            
+        
+        #Process lights first
+        if(useNeoPixels and DATA_REPO.get_light_state()):
+            if(prevLightOn == False):
+                print("[INFO] Lights Turned On")
+                
+            if(DATA_REPO.get_alarm_triggered() == False):
+                neopixelInterface.setCustomNeopixelColors(255, 255, 255)
+                neopixelInterface.activateCustomLightMode()
+        else:
+            if(prevLightOn == True):
+                print("INFO] Lights Turned Off")
+            neopixelInterface.resetMode()
+        prevLightOn = DATA_REPO.get_light_state()
+        
+        #####
+        ## PROCESS MAIN ALARM LOGIC
+        #####
         if(DATA_REPO.get_alarm_state()):
             if(prevAlarmOn == False):
                 print("[INFO] Alarm Turned On")
@@ -132,7 +151,8 @@ def main():
             if(RESET):
                 alarmTripped = False
                 RESET = False
-                alarmAudioInterface.resetMode()
+                if(useAlarmAudio):
+                    alarmAudioInterface.resetMode()
             
             if(useMotionSensor):
                 #print(str(motionSensorInterface.alarmTripped()))
@@ -141,7 +161,7 @@ def main():
                 if(useAlarmAudio and alarmTripped):
                     alarmAudioInterface.activateAlertSound()
                     
-                if(useNeoPixels and alarmTripped()):
+                if(useNeoPixels and alarmTripped):
                     neopixelInterface.activateWindowAlarmMode()
                     
             if(useWindowSensor):

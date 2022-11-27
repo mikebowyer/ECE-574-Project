@@ -30,9 +30,9 @@ class SecurityMessage:
         self.light_on_min = 0x00
         self.light_off_hour = 0x00
         self.light_off_min = 0x00
-        self.lights_color_blue = 0x00
-        self.lights_color_green = 0x00
-        self.lights_color_red = 0x00
+        self.lights_color_blue = 0xFF
+        self.lights_color_green = 0xFF
+        self.lights_color_red = 0xFF
         self.selected_audio_clip = 0x00
         self.alarm_triggered = 0x00
         self.alarm_trigger_event = 0x00

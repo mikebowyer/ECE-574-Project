@@ -8,6 +8,9 @@ class NeopixelInterface:
     pixels = None
     terminate = False
     currentLightMode = "NONE"
+    customBlue = 255
+    customGreen = 255
+    customRed = 255
     def init(self):
         self.pixels = neopixel.NeoPixel(board.D18, 12)
         #self.pixels.fill((127, 127, 127))
@@ -26,6 +29,14 @@ class NeopixelInterface:
     def activateWindowAlarmMode(self):
         self.currentLightMode = "WINDOW_ALARM"
         
+    def activateCustomLightMode(self):
+        self.currentLightMode = "CUSTOM_LIGHTS"
+        
+    def setCustomNeopixelColors(self, red, green, blue):
+        self.customRed = red
+        self.customGreen = green
+        self.customBlue = blue
+        
     #Main Class Thread
     def runNeoPixelInteface(self):
         while not self.terminate:
@@ -35,6 +46,8 @@ class NeopixelInterface:
                 self.exeMotionAlarm()
             elif(self.currentLightMode == "WINDOW_ALARM"):
                 self.exeWindowAlarm()
+            elif(self.currentLightMode == "CUSTOM_LIGHTS"):
+                self.exeCustomLights()
             time.sleep(.1) #Sleep to slow down cpu usage when NONE
         print("NeoPixels Shutdown Complete")
            
@@ -53,6 +66,9 @@ class NeopixelInterface:
             time.sleep(.2)
             self.pixels.fill((0, 0, 0))
             time.sleep(.2)
+    
+    def exeCustomLights(self):
+        self.pixels.fill((self.customRed, self.customGreen, self.customBlue))
         
     def randomTest(self):
         while(not self.terminate):
