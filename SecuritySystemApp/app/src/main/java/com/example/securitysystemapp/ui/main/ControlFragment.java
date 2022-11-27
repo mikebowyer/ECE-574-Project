@@ -194,37 +194,45 @@ public class ControlFragment extends Fragment {
 
         // Setup color selector
         mColorPreview = binding.previewSelectedColor;
-//        mColorPreview.setBackgroundColor(100);
         mColorPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final ColorPicker cp = new ColorPicker(getActivity(), 0, 0, 0);
-                /* Show color picker dialog */
-                cp.show();
+                if(mService != null) {
+                    Integer red = mService.securitySysState.lights_color_red;
+                    Integer green = mService.securitySysState.lights_color_red;
+                    Integer blue = mService.securitySysState.lights_color_red;
+                    final ColorPicker cp = new ColorPicker(getActivity(), red, green, blue);
+                    /* Show color picker dialog */
+                    cp.show();
 
-                cp.enableAutoClose(); // Enable auto-dismiss for the dialog
+                    cp.enableAutoClose(); // Enable auto-dismiss for the dialog
 
-                /* Set a new Listener called when user click "select" */
-                cp.setCallback(new ColorPickerCallback() {
-                    @Override
-                    public void onColorChosen(@ColorInt int color) {
-                        // Do whatever you want
-                        // Examples
-                        Log.d("Alpha", Integer.toString(Color.alpha(color)));
-                        Log.d("Red", Integer.toString(Color.red(color)));
-                        Log.d("Green", Integer.toString(Color.green(color)));
-                        Log.d("Blue", Integer.toString(Color.blue(color)));
+                    /* Set a new Listener called when user click "select" */
+                    cp.setCallback(new ColorPickerCallback() {
+                        @Override
+                        public void onColorChosen(@ColorInt int color) {
+                            // Do whatever you want
+                            // Examples
+                            Log.d("Alpha", Integer.toString(Color.alpha(color)));
+                            Log.d("Red", Integer.toString(Color.red(color)));
+                            Log.d("Green", Integer.toString(Color.green(color)));
+                            Log.d("Blue", Integer.toString(Color.blue(color)));
 
-                        Log.d("Pure Hex", Integer.toHexString(color));
-                        Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
-                        Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
+                            Log.d("Pure Hex", Integer.toHexString(color));
+                            Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
+                            Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
 
-                        // If the auto-dismiss option is not enable (disabled as default) you have to manually dimiss the dialog
-                        // cp.dismiss();
-//                        int color_output = (Color.alpha(color) & 0xff) << 24 | (Color.red(color) & 0xff) << 16 | (Color.green(color) & 0xff) << 8 | (B & 0xff);
-                        mColorPreview.setBackgroundColor(color);
-                    }
-                });
+                            // Change the state and send it
+                            mService.securitySysState.lights_color_red = Color.red(color);
+                            mService.securitySysState.lights_color_red = Color.green(color);
+                            mService.securitySysState.lights_color_red = Color.blue(color);
+                            mService.sendSetStateToSystem();
+
+                            mColorPreview.setBackgroundColor(color);
+                        }
+                    });
+                }
+
             }
         });
 
