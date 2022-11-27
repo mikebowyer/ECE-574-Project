@@ -199,8 +199,8 @@ public class ControlFragment extends Fragment {
             public void onClick(View view) {
                 if(mService != null) {
                     Integer red = mService.securitySysState.lights_color_red;
-                    Integer green = mService.securitySysState.lights_color_red;
-                    Integer blue = mService.securitySysState.lights_color_red;
+                    Integer green = mService.securitySysState.lights_color_green;
+                    Integer blue = mService.securitySysState.lights_color_blue;
                     final ColorPicker cp = new ColorPicker(getActivity(), red, green, blue);
                     /* Show color picker dialog */
                     cp.show();
@@ -224,9 +224,9 @@ public class ControlFragment extends Fragment {
 
                             // Change the state and send it
                             mService.securitySysState.lights_color_red = Color.red(color);
-                            mService.securitySysState.lights_color_red = Color.green(color);
-                            mService.securitySysState.lights_color_red = Color.blue(color);
-                            mService.sendSetStateToSystem();
+                            mService.securitySysState.lights_color_green = Color.green(color);
+                            mService.securitySysState.lights_color_blue = Color.blue(color);
+//                            mService.sendSetStateToSystem();
 
                             mColorPreview.setBackgroundColor(color);
                         }
