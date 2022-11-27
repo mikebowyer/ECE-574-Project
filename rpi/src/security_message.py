@@ -20,6 +20,7 @@ class SecurityMessage:
         # self.set_lights_on_time(13,20)
         # self.set_lights_off_time(2,47)
         # self.set_selected_audio_clip(3)
+        self.set_lights_color(255,0,0)
         self.set_alarm_triggered(False)
 
     def reset_everything(self):
@@ -81,6 +82,12 @@ class SecurityMessage:
         #self.control = self.control | 0x08
         self.light_off_hour = hour
         self.light_off_min = min
+        
+    def set_lights_color(self, red, green, blue):
+        self.control = self.control | 0x10
+        self.lights_color_red = red
+        self.lights_color_green = green
+        self.lights_color_blue = blue
         
     def set_lights_color_blue(self, colorVal):
         self.lights_color_blue = hex(colorVal)

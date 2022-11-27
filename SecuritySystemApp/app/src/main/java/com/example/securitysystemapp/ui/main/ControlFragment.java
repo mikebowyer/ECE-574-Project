@@ -6,8 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -16,19 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
-import com.example.securitysystemapp.R;
 import com.example.securitysystemapp.SecuritySystem;
 import com.example.securitysystemapp.databinding.ControlFragmentBinding;
-import com.example.securitysystemapp.databinding.FragmentMainBinding;
+import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
+import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
+
 
 /**
  * The fragment for the Control tab in the main activity.
@@ -45,6 +42,9 @@ public class ControlFragment extends Fragment {
     // UI Elements & Context Info
     private ControlFragmentBinding binding;
     private Context globalContext = null;
+
+    // Color Picker
+    private View mColorPreview;
 
 //================================================================================
 // class broadcast reception
@@ -92,6 +92,11 @@ public class ControlFragment extends Fragment {
                 break;
             default:
                 break;
+        }
+        if (secState.lights_color_red != -1 && secState.lights_color_green != -1 && secState.lights_color_blue != -1)
+        {
+            int color = (0xff) << 24 | (secState.lights_color_red & 0xff) << 16 | (secState.lights_color_green & 0xff) << 8 | (secState.lights_color_blue & 0xff);
+            mColorPreview.setBackgroundColor(color);
         }
     }
 
@@ -150,10 +155,7 @@ public class ControlFragment extends Fragment {
         ControlReciever receiver = new ControlReciever();
         globalContext.registerReceiver(receiver, filter);
 
-
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -189,6 +191,50 @@ public class ControlFragment extends Fragment {
                     mService.securitySysState.lights = 0;
                 }
                 mService.sendSetStateToSystem();
+            }
+        });
+
+        // Setup color selector
+        mColorPreview = binding.previewSelectedColor;
+        mColorPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mService != null) {
+                    Integer red = mService.securitySysState.lights_color_red;
+                    Integer green = mService.securitySysState.lights_color_green;
+                    Integer blue = mService.securitySysState.lights_color_blue;
+                    final ColorPicker cp = new ColorPicker(getActivity(), red, green, blue);
+                    /* Show color picker dialog */
+                    cp.show();
+
+                    cp.enableAutoClose(); // Enable auto-dismiss for the dialog
+
+                    /* Set a new Listener called when user click "select" */
+                    cp.setCallback(new ColorPickerCallback() {
+                        @Override
+                        public void onColorChosen(@ColorInt int color) {
+                            // Do whatever you want
+                            // Examples
+                            Log.d("Alpha", Integer.toString(Color.alpha(color)));
+                            Log.d("Red", Integer.toString(Color.red(color)));
+                            Log.d("Green", Integer.toString(Color.green(color)));
+                            Log.d("Blue", Integer.toString(Color.blue(color)));
+
+                            Log.d("Pure Hex", Integer.toHexString(color));
+                            Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
+                            Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
+
+                            // Change the state and send it
+                            mService.securitySysState.lights_color_red = Color.red(color);
+                            mService.securitySysState.lights_color_green = Color.green(color);
+                            mService.securitySysState.lights_color_blue = Color.blue(color);
+                            mService.sendSetStateToSystem();
+
+                            mColorPreview.setBackgroundColor(color);
+                        }
+                    });
+                }
+
             }
         });
 
