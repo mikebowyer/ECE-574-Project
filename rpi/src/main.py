@@ -34,9 +34,21 @@ q) quit
             print("[ERROR] Invalid input in userInput")
         
 def main():
-    global DATA_REPO
+    global DATA_REPO 
     global RESET
     prevAlarmOn = False
+    
+    print("Initial Conditions:")
+    print("Alarm On: " + str(DATA_REPO.get_alarm_state()))
+    print("Lights On: " + str(DATA_REPO.get_light_state()))
+    print("Lights On Time Hour: " + str(DATA_REPO.get_lights_on_time_hour_min_tuple()[0]))
+    print("Lights On Time Min: " + str(DATA_REPO.get_lights_on_time_hour_min_tuple()[1]))
+    print("Lights Off Time Hour: " + str(DATA_REPO.get_lights_off_time_hour_min_tuple()[0]))
+    print("Lights Off Time Min: " + str(DATA_REPO.get_lights_off_time_hour_min_tuple()[1]))
+    print("Blue Color: " + str(DATA_REPO.get_lights_color_blue()))
+    print("Green Color: " + str(DATA_REPO.get_lights_color_green()))
+    print("Red Color: " + str(DATA_REPO.get_lights_color_red()))
+    print("Audio Clip Num: " + str(DATA_REPO.get_selected_audio_clip()))
     
     #Testing Configuration
     #NOTE 1: NeoPixels needs to run as root

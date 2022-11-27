@@ -168,7 +168,7 @@ class SecurityMessage:
     def get_lights_on_time_hour_min_tuple(self):
         return (self.light_on_hour, self.light_on_min)
     
-    def set_lights_off_time_hour_min_tuple(self):
+    def get_lights_off_time_hour_min_tuple(self):
         return (self.light_off_hour, self.light_off_min)
         
     def get_lights_color_blue(self):
