@@ -1,6 +1,7 @@
 import time
 import threading
 import tcp_interface
+import datetime
 
 import neopixel_interface
 import motion_sensor_interface
@@ -38,9 +39,10 @@ def main():
     global RESET
     prevAlarmOn = False
     prevLightOn = False
-    
     alarmTypeDict = {"WINDOW1" : False, "DOOR1" : False, "MS1" : False}
         
+    startTimeEpoch_ms = round(time.time() * 1000)
+    print(startTimeEpoch_ms)
     #Testing Configuration
     #NOTE 1: NeoPixels needs to run as root
     #NOTE 2: AlarmAudio (Pydub) causes issues when run as root (currently...need to fix this)
@@ -143,11 +145,28 @@ def main():
                 if(prevLightOn == False):
                     print("[INFO] Lights Turned On")
                 if(DATA_REPO.get_alarm_triggered() == False):
-                    red = DATA_REPO.get_lights_color_red()
-                    green = DATA_REPO.get_lights_color_green()
-                    blue = DATA_REPO.get_lights_color_blue()                  
-                    neopixelInterface.setCustomNeopixelColors(red, green, blue)
-                    neopixelInterface.activateCustomLightMode()
+                    
+                    #Turn of light if not active
+                    timeOnTupleHourMin = DATA_REPO.get_lights_on_time_hour_min_tuple()
+                    timeOffTupleHourMin = DATA_REPO.get_lights_off_time_hour_min_tuple()         
+                    current_time = datetime.datetime.now()
+                    current_hour = current_time.hour
+                    current_min = current_time.minute
+                    current_time_ms = (current_time.hour *60 *60 * 1000) + (current_time.minute * 60 * 1000)
+                    time_on_ms = (timeOnTupleHourMin[0] * 60 * 60  * 1000) + (timeOnTupleHourMin[1] * 60  * 1000)
+                    time_off_ms = (timeOffTupleHourMin[0] * 60 * 60  * 1000) + (timeOffTupleHourMin[1] * 60  * 1000)
+                    #print("Current Time: " + str(current_time_ms))
+                    #print("Time on: " + str(time_on_ms))
+                    #print("Time off: " + str(time_off_ms))
+                    if(time_on_ms < current_time_ms < time_off_ms):
+                        #set current color from app
+                        red = DATA_REPO.get_lights_color_red()
+                        green = DATA_REPO.get_lights_color_green()
+                        blue = DATA_REPO.get_lights_color_blue()                  
+                        neopixelInterface.setCustomNeopixelColors(red, green, blue)
+                        neopixelInterface.activateCustomLightMode()
+                    else:
+                        neopixelInterface.resetMode()
             elif(alarmTripped == False):
                 if(prevLightOn == True):
                     print("INFO] Lights Turned Off")
@@ -158,11 +177,18 @@ def main():
 #Process Audio
 ###############            
         if(useAlarmAudio):
-            if(alarmTypeDict["WINDOW1"] == True):
-                alarmAudioInterface.activateAlarmSound()
+            clipNum = DATA_REPO.get_selected_audio_clip()
+            if((alarmTypeDict["WINDOW1"] == True) or (alarmTypeDict["MS1"] == True)):
+                if(clipNum == 0):
+                    alarmAudioInterface.resetMode()
+                elif(clipNum == 1):
+                    alarmAudioInterface.activateSpookySound()
+                elif(clipNum == 2):
+                    alarmAudioInterface.activateAlertSound() 
+                elif(clipNum == 3):
+                    alarmAudioInterface.activateAlarmSound()
                 
-            elif(alarmTypeDict["MS1"] == True):
-                alarmAudioInterface.activateAlertSound()
+                
 
 ########################################
 ## PROCESS MAIN ALARM LOGIC
