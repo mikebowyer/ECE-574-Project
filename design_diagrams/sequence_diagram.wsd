@@ -11,23 +11,41 @@ Android -> Android : Initiate Initialization Phase
 autonumber 10
 Android -> Rpi : Establish connection
 Rpi -> Android : Connection established
-group System Settings Download [SettingsDownload]
-    Rpi -> Android : Current System Settings Packet
+group System State and Settings Download [StateSettingsDownload]
+    Rpi -> Android : Current System State and Settings Packet
 end
-Android -> User : Display current system settings to user
+Android -> User : Display current system state and settings
 
-== Change Lights State ==
+== Change System State/Setting ==
 autonumber 20
-Android -> User : Display current lights state and color to user
-User -> Android : Change lights state or color
+Android -> User : Display current system state and settings
+User -> Android : Change system state or setting
 
-group Lights State Change [LightStateChange]
-    Android -> Rpi : Current System Settings Packet (with light setting changed)
-    Rpi -> Rpi : Save lights control state
-    Rpi -> Rpi : Change lights state
+group State or Setting Update [StateSettingUpdate]
+    Android -> Android : Update internally stored state/setting
+    Android -> Rpi : Transmit System State and Settings Packet
+    Rpi -> Rpi : Change System State or Setting 
+    Rpi -> Rpi : Update internally stored state/setting
+end
+
+group System State and Settings Download [StateSettingsDownload]
+    Rpi -> Android : Current System State and Settings Packet
 end
 
 Android -> User : Display current lights state to user
+
+' == Change Lights State ==
+' autonumber 20
+' Android -> User : Display current lights state and color to user
+' User -> Android : Change lights state or color
+
+' group Lights State Change [LightStateChange]
+'     Android -> Rpi : Current System Settings Packet (with light setting changed)
+'     Rpi -> Rpi : Save lights control state
+'     Rpi -> Rpi : Change lights state
+' end
+
+' Android -> User : Display current lights state to user
 
 ' == Change Alarm State ==
 ' autonumber 30
