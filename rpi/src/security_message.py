@@ -99,7 +99,7 @@ class SecurityMessage:
         self.lights_color_red = hex(colorVal)
 
     def set_selected_audio_clip(self, clip_num):
-        #self.control = self.control | 0x20
+        self.control = self.control | 0x20
         self.selected_audio_clip = clip_num
 
     def set_alarm_triggered(self, triggered, trigger_event = "unknown"):
