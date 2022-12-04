@@ -51,7 +51,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
 
     // Spinner
     private Spinner spinner;
-    private volatile boolean update_from_broadcast;
+    private volatile boolean update_from_broadcast = false;
 
     // On Time Settings
     static final int LIGHTS_ON_TIME_DIALOG_ID = 1111;
@@ -139,6 +139,11 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         if (mService != null) {
+            //Finish line Hack
+            mService.securitySysState.selected_audio_clip = pos;
+            mService.sendSetStateToSystem();
+            //Original Code
+            /*
             if (! update_from_broadcast) {
                 mService.securitySysState.selected_audio_clip = pos;
                 mService.sendSetStateToSystem();
@@ -146,6 +151,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnItemSele
             else{
                 update_from_broadcast= false;
             }
+             */
         }
     }
 
