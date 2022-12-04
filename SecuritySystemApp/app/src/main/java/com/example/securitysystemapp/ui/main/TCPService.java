@@ -28,7 +28,7 @@ public class TCPService extends Service {
     // Server Information
     public static final String START_SERVER = "startserver";
     public static final int SERVERPORT = 5000;
-    private static final String SERVER_IP = "192.168.0.109";
+    private static final String SERVER_IP = "192.168.1.8";
     Thread connectionThread;
     public Socket clientSocket;
 
