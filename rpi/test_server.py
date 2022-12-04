@@ -6,7 +6,7 @@ import src.security_message
 def server_program():
     # get the hostname
     # host = socket.gethostname()
-    host = "192.168.0.109"
+    host = "192.168.1.8"
     port = 5000  # initiate port no above 1024
     print("Hostname and Port: " + str(host) +":" + str(port))
 
@@ -56,12 +56,12 @@ def server_program():
             conn.send(bytestream)
         elif "t" in data:
             if "1" in data:
-                # print("Simulating alarm triggered by motion detected event!:\n")       
-                # security_sys_state.set_alarm_triggered(True, "motion")
+                print("Simulating alarm triggered by motion detected event!:\n")       
+                security_sys_state.set_alarm_triggered(True, "motion")
                 security_sys_state.set_lights_color(0,255,0)
             if "2" in data:
-                # print("Simulating alarm triggered by door/window opened event!:\n")       
-                # security_sys_state.set_alarm_triggered(True, "window")
+                print("Simulating alarm triggered by door/window opened event!:\n")       
+                security_sys_state.set_alarm_triggered(True, "window")
                 security_sys_state.set_lights_color(0,0,255)
         elif "reset" in data:
             security_sys_state.reset_everything()

@@ -60,26 +60,26 @@ class SecurityMessage:
         return string_to_send
 
     def set_alarm_state(self, state):
-        #self.control = self.control | 0x01
+        self.control = self.control | 0x01
         if state:
             self.alarm_state = 0xFF
         else:
             self.alarm_state = 0x00
 
     def set_light_state(self, state):
-        #self.control = self.control | 0x02
+        self.control = self.control | 0x02
         if state:
             self.light_state = 0xFF
         else:
             self.light_state = 0x00
 
     def set_lights_on_time(self, hour, min):
-        #self.control = self.control | 0x04
+        self.control = self.control | 0x04
         self.light_on_hour = hour
         self.light_on_min = min
     
     def set_lights_off_time(self, hour, min):
-        #self.control = self.control | 0x08
+        self.control = self.control | 0x08
         self.light_off_hour = hour
         self.light_off_min = min
         
@@ -103,7 +103,7 @@ class SecurityMessage:
         self.selected_audio_clip = clip_num
 
     def set_alarm_triggered(self, triggered, trigger_event = "unknown"):
-        #self.control = self.control | 0x40
+        self.control = self.control | 0x40
 
         if triggered:
             self.alarm_triggered = 0xFF
@@ -145,6 +145,7 @@ class SecurityMessage:
 
     def update_selected_audio_clip(self, rx_string):
         self.selected_audio_clip = int(rx_string[20:22], 16)
+        print("AUDIO RX: " + str(self.selected_audio_clip))
             
     def disassemble_packet(self, rx_string):
         #print("RX_STRING: " + rx_string)

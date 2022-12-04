@@ -177,6 +177,8 @@ def main():
 #Process Audio
 ###############            
         if(useAlarmAudio):
+            
+            #print("Selected_Audio: " + str(DATA_REPO.get_selected_audio_clip()))
             clipNum = DATA_REPO.get_selected_audio_clip()
             if((alarmTypeDict["WINDOW1"] == True) or (alarmTypeDict["MS1"] == True)):
                 if(clipNum == 0):
