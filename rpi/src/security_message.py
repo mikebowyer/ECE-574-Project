@@ -145,7 +145,6 @@ class SecurityMessage:
 
     def update_selected_audio_clip(self, rx_string):
         self.selected_audio_clip = int(rx_string[20:22], 16)
-        print("AUDIO RX: " + str(self.selected_audio_clip))
             
     def disassemble_packet(self, rx_string):
         #print("RX_STRING: " + rx_string)
